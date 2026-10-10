@@ -2,6 +2,8 @@
 plugins {
     id 'jukeboxmuse.loader'
     id 'net.neoforged.moddev'
+    // After the loader plugin, which creates the jar task it publishes
+    id 'jukeboxmuse.publish'
     id 'idea'
 }
 

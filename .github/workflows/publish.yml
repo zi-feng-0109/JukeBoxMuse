@@ -1,0 +1,47 @@
+# Publishes a release when a version tag such as v1.0.0 is pushed:
+# uploads both loaders' jars to Modrinth / CurseForge (publishMods) and attaches them to a GitHub release.
+# Needs the MODRINTH_TOKEN and CURSEFORGE_TOKEN repository secrets, and the project ids in gradle.properties.
+name: Publish
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - run: chmod +x gradlew
+
+      # The tag must match mod_version, or the uploaded files would carry a different version than the tag
+      - name: Check tag matches mod_version
+        run: |
+          version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
+          if [ "v$version" != "$GITHUB_REF_NAME" ]; then
+            echo "Tag $GITHUB_REF_NAME does not match mod_version=$version"
+            exit 1
+          fi
+
+      - run: ./gradlew build publishMods
+        env:
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+          CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            neoforge/build/libs/jukeboxmuse-neoforge-*.jar
+            fabric/build/libs/jukeboxmuse-fabric-*.jar

@@ -40,6 +40,7 @@ repo/
 !**/src/**/repo/
 
 ### Local game output ###
-# Logs and configs can hold raw API responses and login credentials
-logs/
-config/
+# Logs and configs can hold raw API responses and login credentials. Anchored to the project root: an unanchored
+# "config/" also hid the core config package. Game directories under */run/ are covered by "run/" above.
+/logs/
+/config/

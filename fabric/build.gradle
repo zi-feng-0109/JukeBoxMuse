@@ -2,6 +2,8 @@
 plugins {
     id 'jukeboxmuse.loader'
     id 'fabric-loom'
+    // After Loom, which creates the remapJar task it publishes
+    id 'jukeboxmuse.publish'
 }
 
 repositories {

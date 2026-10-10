@@ -1,0 +1,54 @@
+// Uploads a loader project's jar to Modrinth and CurseForge with `./gradlew publishMods`.
+// Tokens come from the MODRINTH_TOKEN / CURSEFORGE_TOKEN environment variables; without them the upload is a dry run.
+// A platform is skipped while its project id in gradle.properties is empty.
+plugins {
+    id 'me.modmuss50.mod-publish-plugin'
+}
+
+def loader = project.name                          // 'neoforge' or 'fabric'
+def loaderName = [neoforge: 'NeoForge', fabric: 'Fabric'][loader]
+// Fabric's distributable jar is the remapped one; NeoForge runs Mojang names directly
+def modJar = tasks.named(loader == 'fabric' ? 'remapJar' : 'jar', AbstractArchiveTask)
+
+/** The "## <version>" section of CHANGELOG.md. */
+def changelogFor = { String version ->
+    def lines = rootProject.file('CHANGELOG.md').readLines('UTF-8')
+    def start = lines.findIndexOf { it.trim() == "## ${version}" }
+    if (start < 0) throw new GradleException("CHANGELOG.md has no '## ${version}' section")
+    def end = lines.findIndexOf(start + 1) { it.startsWith('## ') }
+    lines.subList(start + 1, end < 0 ? lines.size() : end).join('\n').trim()
+}
+
+def modrinthToken = providers.environmentVariable('MODRINTH_TOKEN')
+def curseforgeToken = providers.environmentVariable('CURSEFORGE_TOKEN')
+
+publishMods {
+    file = modJar.flatMap { it.archiveFile }
+    changelog = providers.provider { changelogFor(mod_version) }
+    type = STABLE
+    displayName = "${mod_name} ${mod_version} (${loaderName} ${minecraft_version})"
+    version = "${mod_version}+${minecraft_version}-${loader}"
+    modLoaders.add(loader)
+    dryRun = !modrinthToken.isPresent() && !curseforgeToken.isPresent()
+
+    if (modrinth_project_id) {
+        modrinth {
+            accessToken = modrinthToken
+            projectId = modrinth_project_id
+            minecraftVersions.add(minecraft_version)
+            if (loader == 'fabric') requires('fabric-api')
+        }
+    }
+    if (curseforge_project_id) {
+        curseforge {
+            accessToken = curseforgeToken
+            projectId = curseforge_project_id
+            minecraftVersions.add(minecraft_version)
+            javaVersions.add(JavaVersion.VERSION_21)
+            // The mod must be installed on both sides
+            clientRequired = true
+            serverRequired = true
+            if (loader == 'fabric') requires('fabric-api')
+        }
+    }
+}

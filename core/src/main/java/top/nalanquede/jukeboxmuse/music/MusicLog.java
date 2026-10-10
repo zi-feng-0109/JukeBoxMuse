@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 public final class MusicLog {
     public static final Logger LOGGER = LoggerFactory.getLogger("JukeboxMuse");
 
-    private static volatile BooleanSupplier debug = () -> true;
+    private static volatile BooleanSupplier debug = () -> false;
 
     private MusicLog() {
     }
