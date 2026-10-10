@@ -1,0 +1,65 @@
+// The Fabric mod: Fabric entry points and events, plus core's and common's sources (see jukeboxmuse.loader).
+plugins {
+    id 'jukeboxmuse.loader'
+    id 'fabric-loom'
+}
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'ParchmentMC'
+                url = 'https://maven.parchmentmc.org/'
+            }
+        }
+        filter { includeGroup('org.parchmentmc.data') }
+    }
+}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    // Mojang names (+ Parchment parameter names), the same as the neoforge and common projects use
+    mappings loom.layered {
+        officialMojangMappings()
+        parchment("org.parchmentmc.data:parchment-${parchment_minecraft_version}:${parchment_mappings_version}@zip")
+    }
+    modImplementation "net.fabricmc:fabric-loader:${fabric_loader_version}"
+    modImplementation "net.fabricmc.fabric-api:fabric-api:${fabric_api_version}"
+
+    // QR codes (login, decoding QQ's PNG) and MP3 decoding, nested into the mod jar
+    include(implementation("com.google.zxing:core:3.5.3"))
+    include(implementation("javazoom:jlayer:1.0.1"))
+}
+
+loom {
+    runs {
+        client {
+            client()
+            setConfigName('Fabric Client')
+            ideConfigGenerated(true)
+            runDir('run/client')
+        }
+        server {
+            server()
+            setConfigName('Fabric Server')
+            ideConfigGenerated(true)
+            runDir('run/server')
+        }
+    }
+}
+
+processResources {
+    var props = [
+            mod_id               : mod_id,
+            mod_name             : mod_name,
+            mod_version          : mod_version,
+            mod_license          : mod_license,
+            mod_authors          : mod_authors,
+            minecraft_version    : minecraft_version,
+            fabric_loader_version: fabric_loader_version,
+    ]
+    inputs.properties props
+    filesMatching('fabric.mod.json') {
+        expand props
+    }
+}

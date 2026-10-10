@@ -1,7 +1,9 @@
-// Subprojects: core (plain Java), common (vanilla Minecraft code), neoforge (the NeoForge mod).
+// Subprojects: core (plain Java), common (vanilla Minecraft code), neoforge and fabric (the mod for each loader).
 plugins {
     // see https://projects.neoforged.net/neoforged/moddevgradle for new versions
     id 'net.neoforged.moddev' version '2.0.148' apply false
+    // see https://fabricmc.net/develop/ for new versions; 1.16+ needs a newer Gradle, 1.18+ Java 25
+    id 'fabric-loom' version '1.15.5' apply false
 }
 
 tasks.named('wrapper', Wrapper).configure {

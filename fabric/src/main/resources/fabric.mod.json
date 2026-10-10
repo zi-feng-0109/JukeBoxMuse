@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "点歌姬 - In-game song requests from KuGou, NetEase Cloud Music and QQ Music. Must be installed on both server and client.",
+  "authors": ["${mod_authors}"],
+  "license": "${mod_license}",
+  "environment": "*",
+  "entrypoints": {
+    "main": ["top.nalanquede.jukeboxmuse.fabric.JukeboxMuseFabric"],
+    "client": ["top.nalanquede.jukeboxmuse.fabric.JukeboxMuseFabricClient"]
+  },
+  "depends": {
+    "fabricloader": ">=${fabric_loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}",
+    "java": ">=21"
+  }
+}
