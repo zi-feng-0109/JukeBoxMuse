@@ -35,8 +35,7 @@ tasks.named('test', Test) {
 }
 
 base {
-    // Jar file name only; the mod ID stays kgmusic so configs and the network protocol are unaffected
-    archivesName = 'jukeboxmuse'
+    archivesName = mod_id
 }
 
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.

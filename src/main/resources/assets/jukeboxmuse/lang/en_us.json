@@ -1,0 +1,13 @@
+{
+  "key.jukeboxmuse.open": "Open song requests",
+  "key.categories.jukeboxmuse": "Jukebox Muse",
+  "jukeboxmuse.configuration.title": "Jukebox Muse Configs",
+  "jukeboxmuse.configuration.cooldownSeconds": "Request cooldown (seconds)",
+  "jukeboxmuse.configuration.maxQueuedPerPlayer": "Max queued per player",
+  "jukeboxmuse.configuration.maxQueueSize": "Max queue size",
+  "jukeboxmuse.configuration.quality": "Quality (128 / 320)",
+  "jukeboxmuse.configuration.debugLog": "Log raw music API responses",
+  "jukeboxmuse.configuration.volume": "Volume",
+  "jukeboxmuse.configuration.muted": "Muted",
+  "jukeboxmuse.configuration.lyricHud": "Show lyric at top of screen"
+}

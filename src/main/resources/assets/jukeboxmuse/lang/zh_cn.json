@@ -1,0 +1,13 @@
+{
+  "key.jukeboxmuse.open": "打开点歌界面",
+  "key.categories.jukeboxmuse": "点歌姬",
+  "jukeboxmuse.configuration.title": "点歌姬设置",
+  "jukeboxmuse.configuration.cooldownSeconds": "点歌冷却（秒）",
+  "jukeboxmuse.configuration.maxQueuedPerPlayer": "每人最多排队",
+  "jukeboxmuse.configuration.maxQueueSize": "队列上限",
+  "jukeboxmuse.configuration.quality": "音质（128 / 320）",
+  "jukeboxmuse.configuration.debugLog": "记录音乐平台原始响应",
+  "jukeboxmuse.configuration.volume": "音量",
+  "jukeboxmuse.configuration.muted": "静音",
+  "jukeboxmuse.configuration.lyricHud": "屏幕顶部显示歌词"
+}
