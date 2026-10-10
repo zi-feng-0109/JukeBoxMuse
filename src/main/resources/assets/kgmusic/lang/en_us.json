@@ -1,0 +1,13 @@
+{
+  "key.kgmusic.open": "Open song requests",
+  "key.categories.kgmusic": "Jukebox Muse",
+  "kgmusic.configuration.title": "Jukebox Muse Configs",
+  "kgmusic.configuration.cooldownSeconds": "Request cooldown (seconds)",
+  "kgmusic.configuration.maxQueuedPerPlayer": "Max queued per player",
+  "kgmusic.configuration.maxQueueSize": "Max queue size",
+  "kgmusic.configuration.quality": "Quality (128 / 320)",
+  "kgmusic.configuration.debugLog": "Log raw music API responses",
+  "kgmusic.configuration.volume": "Volume",
+  "kgmusic.configuration.muted": "Muted",
+  "kgmusic.configuration.lyricHud": "Show lyric at top of screen"
+}

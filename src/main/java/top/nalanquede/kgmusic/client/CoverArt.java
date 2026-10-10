@@ -1,0 +1,135 @@
+package top.nalanquede.kgmusic.client;
+
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.imageio.ImageIO;
+
+import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.resources.ResourceLocation;
+import top.nalanquede.kgmusic.KgMusic;
+import top.nalanquede.kgmusic.common.Song;
+
+/**
+ * Album covers as spinning vinyl records. Covers download and decode on a background thread, then become a
+ * texture on the render thread. Until then, or when a cover cannot be loaded (no URL, network error, no
+ * javax.imageio as on some Android launchers), the platform's vanilla music disc spins instead.
+ */
+public final class CoverArt {
+    private static final int MAX_BYTES = 2 * 1024 * 1024;
+    private static final int MAX_TEXTURES = 12;
+    private static final HttpClient HTTP = HttpClient.newBuilder()
+            .connectTimeout(Duration.ofSeconds(10))
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .build();
+    private static final ExecutorService LOADER = Executors.newSingleThreadExecutor(r -> {
+        Thread t = new Thread(r, "KgMusic-Cover");
+        t.setDaemon(true);
+        return t;
+    });
+    // Render thread only. Access order, so the eldest entry is the least recently drawn cover.
+    private static final Map<String, Entry> CACHE = new LinkedHashMap<>(16, 0.75f, true);
+    private static int nextId;
+
+    private static final class Entry {
+        ResourceLocation texture;
+    }
+
+    private CoverArt() {
+    }
+
+    /** Starts loading url if it is not cached yet; returns the texture once it is ready, else null. */
+    public static ResourceLocation texture(String url) {
+        if (url == null || url.isEmpty()) return null;
+        Entry entry = CACHE.get(url);
+        if (entry == null) {
+            Entry created = new Entry();
+            CACHE.put(url, created);
+            evict();
+            LOADER.execute(() -> load(url, created));
+            return null;
+        }
+        return entry.texture;
+    }
+
+    /** Draws song's cover as a record of size×size at (x, y), turned by degrees around its centre. */
+    public static void renderDisc(GuiGraphics g, Song song, int x, int y, int size, float degrees) {
+        ResourceLocation texture = texture(song.coverUrl());
+        PoseStack pose = g.pose();
+        pose.pushPose();
+        pose.translate(x + size / 2f, y + size / 2f, 0);
+        pose.mulPose(Axis.ZP.rotationDegrees(degrees));
+        if (texture != null) {
+            RenderSystem.enableBlend();
+            g.blit(texture, -size / 2, -size / 2, size, size, 0, 0, VinylImage.SIZE, VinylImage.SIZE, VinylImage.SIZE, VinylImage.SIZE);
+            RenderSystem.disableBlend();
+        } else {
+            float scale = size / 16f;
+            pose.scale(scale, scale, 1);
+            g.renderItem(McGui.disc(song.platform()), -8, -8);
+        }
+        pose.popPose();
+    }
+
+    private static void load(String url, Entry entry) {
+        try {
+            HttpRequest request = HttpRequest.newBuilder(URI.create(url))
+                    .timeout(Duration.ofSeconds(15))
+                    .header("User-Agent", "Mozilla/5.0")
+                    .GET()
+                    .build();
+            HttpResponse<byte[]> response = HTTP.send(request, HttpResponse.BodyHandlers.ofByteArray());
+            if (response.statusCode() >= 400 || response.body().length > MAX_BYTES) return;
+            BufferedImage cover = ImageIO.read(new ByteArrayInputStream(response.body()));
+            if (cover == null) return;
+            int[] argb = VinylImage.compose(cover);
+            Minecraft.getInstance().execute(() -> upload(entry, argb));
+        } catch (Throwable e) {
+            // Includes NoClassDefFoundError where javax.imageio is missing; the vanilla disc stays
+            KgMusic.LOGGER.debug("Cannot load cover {}: {}", url, e.toString());
+        }
+    }
+
+    private static void upload(Entry entry, int[] argb) {
+        // The entry may have been evicted while this cover was downloading
+        if (!CACHE.containsValue(entry)) return;
+        NativeImage image = new NativeImage(VinylImage.SIZE, VinylImage.SIZE, true);
+        for (int i = 0; i < argb.length; i++) {
+            int p = argb[i];
+            // NativeImage wants ABGR
+            int abgr = p & 0xFF00FF00 | (p & 0xFF) << 16 | p >> 16 & 0xFF;
+            image.setPixelRGBA(i % VinylImage.SIZE, i / VinylImage.SIZE, abgr);
+        }
+        DynamicTexture texture = new DynamicTexture(image);
+        texture.setFilter(true, false);
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(KgMusic.MODID, "cover/" + nextId++);
+        Minecraft.getInstance().getTextureManager().register(id, texture);
+        entry.texture = id;
+    }
+
+    private static void evict() {
+        Iterator<Entry> it = CACHE.values().iterator();
+        while (CACHE.size() > MAX_TEXTURES && it.hasNext()) {
+            Entry old = it.next();
+            it.remove();
+            if (old.texture != null) Minecraft.getInstance().getTextureManager().release(old.texture);
+        }
+    }
+}
