@@ -15,8 +15,8 @@ import javazoom.jl.decoder.Header;
 import javazoom.jl.decoder.SampleBuffer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.sounds.SoundSource;
-import top.nalanquede.jukeboxmuse.MuseConfig;
 import top.nalanquede.jukeboxmuse.JukeboxMuse;
+import top.nalanquede.jukeboxmuse.config.ClientSettings;
 
 /**
  * Plays an MP3 URL: {@link SongDownload} (whole file into memory) → JLayer decode → OpenAL streaming source. Uses OpenAL directly (not javax.sound)
@@ -62,9 +62,9 @@ public final class AudioPlayer {
     }
 
     private static float gain() {
-        if (MuseConfig.MUTED.get()) return 0f;
+        if (ClientSettings.get().muted()) return 0f;
         var options = Minecraft.getInstance().options;
-        return (float) (MuseConfig.VOLUME.get() * options.getSoundSourceVolume(SoundSource.MASTER) * options.getSoundSourceVolume(SoundSource.RECORDS));
+        return (float) (ClientSettings.get().volume() * options.getSoundSourceVolume(SoundSource.MASTER) * options.getSoundSourceVolume(SoundSource.RECORDS));
     }
 
     private static final class Worker implements Runnable {

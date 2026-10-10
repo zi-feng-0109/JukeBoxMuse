@@ -8,9 +8,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
-import net.neoforged.neoforge.network.PacketDistributor;
 import top.nalanquede.jukeboxmuse.common.Song;
 import top.nalanquede.jukeboxmuse.network.MusePayloads.RequestSongC2S;
+import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 
 /**
  * One search result drawn as a full-width vanilla button, like a villager trade: disc, title, state, duration.
@@ -28,7 +28,7 @@ final class SongRow extends AbstractButton {
     public void onPress() {
         if (ClientState.trackState(song) != ClientState.TrackState.NONE) return;
         ClientState.markPending(song);
-        PacketDistributor.sendToServer(new RequestSongC2S(song));
+        LoaderServices.get().sendToServer(new RequestSongC2S(song));
     }
 
     @Override

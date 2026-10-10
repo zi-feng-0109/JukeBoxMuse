@@ -21,20 +21,19 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.loading.FMLPaths;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.nalanquede.jukeboxmuse.MuseConfig;
 import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.common.LoginMethod;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
 import top.nalanquede.jukeboxmuse.common.Song;
+import top.nalanquede.jukeboxmuse.config.ServerSettings;
 import top.nalanquede.jukeboxmuse.kugou.KugouProvider;
 import top.nalanquede.jukeboxmuse.music.MusicException;
-import top.nalanquede.jukeboxmuse.music.MusicProvider;
 import top.nalanquede.jukeboxmuse.music.MusicProvider.LoginQr;
+import top.nalanquede.jukeboxmuse.music.MusicProvider;
 import top.nalanquede.jukeboxmuse.netease.NeteaseApi;
 import top.nalanquede.jukeboxmuse.network.MusePayloads.*;
+import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 import top.nalanquede.jukeboxmuse.qqmusic.QqMusicApi;
 
 /**
@@ -88,7 +87,8 @@ public final class MusicService {
 
     private MusicService(MinecraftServer server) {
         this.server = server;
-        Path dir = FMLPaths.CONFIGDIR.get().resolve(JukeboxMuse.MODID);
+        Path dir = JukeboxMuse.configDir();
+        ServerSettings.load(dir.resolve("server.json"));
         addProvider(new KugouProvider(dir.resolve("kugou.json")));
         addProvider(new NeteaseApi(dir.resolve("netease.json")));
         addProvider(new QqMusicApi(dir.resolve("qqmusic.json")));
@@ -252,17 +252,17 @@ public final class MusicService {
             return;
         }
         Long last = lastRequest.get(player.getUUID());
-        long cooldown = MuseConfig.COOLDOWN_SECONDS.get() * 1000L;
+        long cooldown = ServerSettings.current().cooldownSeconds() * 1000L;
         if (last != null && now - last < cooldown && !manager) {
             fail(player, "点歌太快了，请 " + ((cooldown - (now - last)) / 1000 + 1) + " 秒后再试");
             return;
         }
         long mine = queue.stream().filter(e -> e.requester().equals(name)).count();
-        if (mine >= MuseConfig.MAX_PER_PLAYER.get() && !manager) {
+        if (mine >= ServerSettings.current().maxQueuedPerPlayer() && !manager) {
             fail(player, "你已经点了 " + mine + " 首在排队，等播完再点吧");
             return;
         }
-        if (queue.size() >= MuseConfig.MAX_QUEUE.get()) {
+        if (queue.size() >= ServerSettings.current().maxQueueSize()) {
             fail(player, "队列已满");
             return;
         }
@@ -318,7 +318,7 @@ public final class MusicService {
         queue.clear();
         current = null;
         currentUrl = "";
-        PacketDistributor.sendToAllPlayers(StopS2C.INSTANCE);
+        LoaderServices.get().sendToAllPlayers(StopS2C.INSTANCE);
         syncQueue();
         broadcast(Component.literal("[点歌] " + source.getTextName() + " 清空了点歌队列").withStyle(ChatFormatting.GRAY));
     }
@@ -331,13 +331,13 @@ public final class MusicService {
         currentUrl = "";
         currentLyric = MusicProvider.LyricText.EMPTY;
         if (next == null) {
-            PacketDistributor.sendToAllPlayers(StopS2C.INSTANCE);
+            LoaderServices.get().sendToAllPlayers(StopS2C.INSTANCE);
             syncQueue();
             return;
         }
         resolving = true;
         syncQueue();
-        String quality = MuseConfig.QUALITY.get();
+        String quality = ServerSettings.current().quality();
         async(next.song().platform(), p -> {
             String url = p.songUrl(next.song(), quality);
             MusicProvider.LyricText lyric;
@@ -358,13 +358,13 @@ public final class MusicService {
             currentUrl = res.url();
             currentLyric = res.lyric();
             startMs = System.currentTimeMillis();
-            PacketDistributor.sendToAllPlayers(new PlayS2C(current, currentUrl, 0, currentLyric.lrc(), currentLyric.translation()));
+            LoaderServices.get().sendToAllPlayers(new PlayS2C(current, currentUrl, 0, currentLyric.lrc(), currentLyric.translation()));
             broadcast(Component.literal("[点歌] 正在播放《" + current.song().title() + "》（" + current.requester() + " 点的）").withStyle(ChatFormatting.GREEN));
         });
     }
 
     private void syncQueue() {
-        PacketDistributor.sendToAllPlayers(new QueueS2C(List.copyOf(queue)));
+        LoaderServices.get().sendToAllPlayers(new QueueS2C(List.copyOf(queue)));
     }
 
     /** Full state for a player who just joined or opened the screen. */
@@ -523,7 +523,7 @@ public final class MusicService {
     // ---------- helpers ----------
 
     private static void reply(ServerPlayer player, net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
-        PacketDistributor.sendToPlayer(player, payload);
+        LoaderServices.get().sendToPlayer(player, payload);
     }
 
     private static void fail(ServerPlayer player, String message) {

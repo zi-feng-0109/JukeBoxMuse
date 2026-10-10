@@ -6,8 +6,8 @@ import java.util.Map;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import top.nalanquede.jukeboxmuse.common.Platform;
-import top.nalanquede.jukeboxmuse.network.MusePayloads.*;
 import top.nalanquede.jukeboxmuse.lyrics.Lyrics;
+import top.nalanquede.jukeboxmuse.network.MusePayloads.*;
 
 /** Handlers for server→client packets. Run on the client main thread. */
 public final class ClientHandlers {

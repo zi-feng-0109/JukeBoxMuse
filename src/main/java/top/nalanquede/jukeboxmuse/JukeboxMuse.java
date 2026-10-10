@@ -1,34 +1,30 @@
 package top.nalanquede.jukeboxmuse;
 
+import java.nio.file.Path;
+
 import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.ModContainer;
-import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.config.ModConfig;
+import top.nalanquede.jukeboxmuse.config.ServerSettings;
 import top.nalanquede.jukeboxmuse.music.MusicLog;
-import top.nalanquede.jukeboxmuse.network.MuseNetwork;
+import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 
-@Mod(JukeboxMuse.MODID)
-public class JukeboxMuse {
+/** Loader-independent constants and setup. Each loader's entry point calls {@link #init} first. */
+public final class JukeboxMuse {
     public static final String MODID = "jukeboxmuse";
     public static final Logger LOGGER = LogUtils.getLogger();
 
-    public JukeboxMuse(IEventBus modEventBus, ModContainer modContainer) {
-        modContainer.registerConfig(ModConfig.Type.COMMON, MuseConfig.COMMON_SPEC);
-        modContainer.registerConfig(ModConfig.Type.CLIENT, MuseConfig.CLIENT_SPEC);
-        modEventBus.addListener(MuseNetwork::register);
-        MusicLog.setDebug(JukeboxMuse::debugLogging);
+    private JukeboxMuse() {
     }
 
-    public static boolean debugLogging() {
-        try {
-            return MuseConfig.DEBUG_LOG.get();
-        } catch (IllegalStateException e) {
-            // Config not loaded yet
-            return true;
-        }
+    public static void init(LoaderServices services) {
+        LoaderServices.install(services);
+        MusicLog.setDebug(() -> ServerSettings.current().debugLog());
+    }
+
+    /** config/jukeboxmuse/, holding the settings and the logged-in accounts. */
+    public static Path configDir() {
+        return LoaderServices.get().configDir().resolve(MODID);
     }
 }

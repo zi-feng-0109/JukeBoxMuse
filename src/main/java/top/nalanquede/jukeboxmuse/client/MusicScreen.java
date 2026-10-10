@@ -20,14 +20,14 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.neoforge.network.PacketDistributor;
-import top.nalanquede.jukeboxmuse.MuseConfig;
 import top.nalanquede.jukeboxmuse.common.LoginMethod;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
 import top.nalanquede.jukeboxmuse.common.Song;
-import top.nalanquede.jukeboxmuse.network.MusePayloads.*;
+import top.nalanquede.jukeboxmuse.config.ClientSettings;
 import top.nalanquede.jukeboxmuse.lyrics.Lyrics;
+import top.nalanquede.jukeboxmuse.network.MusePayloads.*;
+import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 
 /**
  * The song request GUI in vanilla container style: creative-inventory tabs with item icons above a gray panel.
@@ -145,16 +145,14 @@ public class MusicScreen extends Screen {
     private void initNow() {
         int y = top + H - 26;
         int x = left + 8;
-        addRenderableWidget(Button.builder(Component.literal("切歌"), b -> PacketDistributor.sendToServer(SkipC2S.INSTANCE))
+        addRenderableWidget(Button.builder(Component.literal("切歌"), b -> LoaderServices.get().sendToServer(SkipC2S.INSTANCE))
                 .bounds(x, y, 50, 20).build()).active = ClientState.nowPlaying != null;
-        addRenderableWidget(Button.builder(Component.literal(MuseConfig.MUTED.get() ? "取消静音" : "静音"), b -> {
-            MuseConfig.MUTED.set(!MuseConfig.MUTED.get());
-            MuseConfig.MUTED.save();
+        addRenderableWidget(Button.builder(Component.literal(ClientSettings.get().muted() ? "取消静音" : "静音"), b -> {
+            ClientSettings.get().setMuted(!ClientSettings.get().muted());
             rebuildWidgets();
         }).bounds(x + 54, y, 60, 20).build());
-        addRenderableWidget(Button.builder(Component.literal(MuseConfig.LYRIC_HUD.get() ? "歌词悬浮：开" : "歌词悬浮：关"), b -> {
-            MuseConfig.LYRIC_HUD.set(!MuseConfig.LYRIC_HUD.get());
-            MuseConfig.LYRIC_HUD.save();
+        addRenderableWidget(Button.builder(Component.literal(ClientSettings.get().lyricHud() ? "歌词悬浮：开" : "歌词悬浮：关"), b -> {
+            ClientSettings.get().setLyricHud(!ClientSettings.get().lyricHud());
             rebuildWidgets();
         }).bounds(x + 118, y, 84, 20).build());
         addRenderableWidget(new VolumeSlider(x + 206, y, left + W - 8 - (x + 206), 20));
@@ -299,7 +297,7 @@ public class MusicScreen extends Screen {
         ClientState.searching = true;
         ClientState.searchError = "";
         searchScroll = 0;
-        PacketDistributor.sendToServer(new SearchC2S(platform, kw, page));
+        LoaderServices.get().sendToServer(new SearchC2S(platform, kw, page));
     }
 
     private void renderSearchBackground(GuiGraphics g) {
@@ -335,7 +333,7 @@ public class MusicScreen extends Screen {
             QueueEntry e = queue.get(index);
             if (e.requester().equals(me) || ClientState.canManage) {
                 Button remove = Button.builder(Component.literal("✕"), b -> {
-                    PacketDistributor.sendToServer(new RemoveC2S(index));
+                    LoaderServices.get().sendToServer(new RemoveC2S(index));
                     b.active = false;
                 }).bounds(left + 8 + listWidth() - 19, listRowY(QUEUE_LIST_TOP, i) + 2, 16, 16).build();
                 remove.setTooltip(Tooltip.create(Component.literal("从队列删除")));
@@ -404,10 +402,10 @@ public class MusicScreen extends Screen {
         for (int i = 0; i < methods.size(); i++) {
             LoginMethod m = methods.get(i);
             String label = methods.size() == 1 && account.loggedIn() ? "重新扫码登录" : m.buttonLabel();
-            addRenderableWidget(Button.builder(Component.literal(label), b -> PacketDistributor.sendToServer(new LoginStartC2S(m)))
+            addRenderableWidget(Button.builder(Component.literal(label), b -> LoaderServices.get().sendToServer(new LoginStartC2S(m)))
                     .bounds(x + i * (mw + 2), top + 92, mw, 20).build());
         }
-        addRenderableWidget(Button.builder(Component.literal("退出登录"), b -> PacketDistributor.sendToServer(new LogoutC2S(accountPlatform)))
+        addRenderableWidget(Button.builder(Component.literal("退出登录"), b -> LoaderServices.get().sendToServer(new LogoutC2S(accountPlatform)))
                 .bounds(x, top + 116, ACCOUNT_COL, 20).build()).active = account.loggedIn();
     }
 
@@ -645,7 +643,7 @@ public class MusicScreen extends Screen {
         if (tab == Tab.SEARCH && searchBox != null && searchBox.isFocused() && keyCode != GLFW.GLFW_KEY_ESCAPE) {
             return super.keyPressed(keyCode, scanCode, modifiers);
         }
-        if (MuseClient.OPEN_KEY.matches(keyCode, scanCode)) {
+        if (ClientHooks.OPEN_KEY.matches(keyCode, scanCode)) {
             onClose();
             return true;
         }
@@ -667,7 +665,7 @@ public class MusicScreen extends Screen {
 
     private static final class VolumeSlider extends AbstractSliderButton {
         VolumeSlider(int x, int y, int w, int h) {
-            super(x, y, w, h, Component.empty(), MuseConfig.VOLUME.get());
+            super(x, y, w, h, Component.empty(), ClientSettings.get().volume());
             updateMessage();
         }
 
@@ -678,8 +676,7 @@ public class MusicScreen extends Screen {
 
         @Override
         protected void applyValue() {
-            MuseConfig.VOLUME.set(value);
-            MuseConfig.VOLUME.save();
+            ClientSettings.get().setVolume(value);
         }
     }
 }

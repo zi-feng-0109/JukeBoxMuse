@@ -1,4 +1,4 @@
-package top.nalanquede.jukeboxmuse.server;
+package top.nalanquede.jukeboxmuse.neoforge;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -9,10 +9,12 @@ import net.neoforged.neoforge.event.server.ServerStartedEvent;
 import net.neoforged.neoforge.event.server.ServerStoppingEvent;
 import net.neoforged.neoforge.event.tick.ServerTickEvent;
 import top.nalanquede.jukeboxmuse.JukeboxMuse;
+import top.nalanquede.jukeboxmuse.server.MuseCommands;
+import top.nalanquede.jukeboxmuse.server.MusicService;
 
 @EventBusSubscriber(modid = JukeboxMuse.MODID)
-public final class ServerEvents {
-    private ServerEvents() {
+final class NeoForgeServerEvents {
+    private NeoForgeServerEvents() {
     }
 
     @SubscribeEvent
