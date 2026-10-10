@@ -3,10 +3,10 @@ package top.nalanquede.jukeboxmuse.kugou;
 import java.nio.file.Path;
 import java.util.List;
 
-import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.common.LoginMethod;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.Song;
+import top.nalanquede.jukeboxmuse.music.MusicLog;
 import top.nalanquede.jukeboxmuse.music.MusicProvider;
 
 /** {@link MusicProvider} on top of {@link KugouApi}; the account lives in config/jukeboxmuse/kugou.json. */
@@ -43,9 +43,9 @@ public final class KugouProvider implements MusicProvider {
         if (api.account().hasDfid()) return;
         try {
             api.registerDev();
-            JukeboxMuse.LOGGER.info("KuGou device registered, dfid={}", api.account().dfid);
+            MusicLog.LOGGER.info("KuGou device registered, dfid={}", api.account().dfid);
         } catch (KugouException e) {
-            JukeboxMuse.LOGGER.warn("KuGou device registration failed: {}", e.getMessage());
+            MusicLog.LOGGER.warn("KuGou device registration failed: {}", e.getMessage());
         }
     }
 

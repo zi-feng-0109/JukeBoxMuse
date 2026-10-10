@@ -1,4 +1,4 @@
-package top.nalanquede.jukeboxmuse.client;
+package top.nalanquede.jukeboxmuse.lyrics;
 
 import java.util.ArrayList;
 import java.util.Comparator;

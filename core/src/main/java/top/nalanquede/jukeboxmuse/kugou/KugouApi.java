@@ -10,9 +10,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.Song;
+import top.nalanquede.jukeboxmuse.music.MusicLog;
 import top.nalanquede.jukeboxmuse.music.Json;
 import top.nalanquede.jukeboxmuse.music.MusicProvider.LyricText;
 
@@ -277,7 +277,7 @@ public final class KugouApi {
             try {
                 return Krc.toLrc(KugouCrypto.decodeKrc(krc));
             } catch (Exception e) {
-                JukeboxMuse.LOGGER.warn("KuGou KRC decode failed, falling back to LRC: {}", e.toString());
+                MusicLog.LOGGER.warn("KuGou KRC decode failed, falling back to LRC: {}", e.toString());
             }
         }
         String lrc = downloadLyric(best, "lrc");

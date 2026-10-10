@@ -8,6 +8,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
+import top.nalanquede.jukeboxmuse.music.MusicLog;
 import top.nalanquede.jukeboxmuse.network.MuseNetwork;
 
 @Mod(JukeboxMuse.MODID)
@@ -19,6 +20,7 @@ public class JukeboxMuse {
         modContainer.registerConfig(ModConfig.Type.COMMON, MuseConfig.COMMON_SPEC);
         modContainer.registerConfig(ModConfig.Type.CLIENT, MuseConfig.CLIENT_SPEC);
         modEventBus.addListener(MuseNetwork::register);
+        MusicLog.setDebug(JukeboxMuse::debugLogging);
     }
 
     public static boolean debugLogging() {

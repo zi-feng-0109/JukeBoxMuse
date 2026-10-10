@@ -38,6 +38,10 @@ base {
     archivesName = mod_id
 }
 
+// core's classes become part of this mod (see neoForge.mods and the jar task), so its model must exist first
+evaluationDependsOn(':core')
+def coreMain = project(':core').sourceSets.main
+
 // Mojang ships Java 21 to end users in 1.21.1, so mods should target Java 21.
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
@@ -107,6 +111,7 @@ neoForge {
         // multi mod projects should define one per mod
         "${mod_id}" {
             sourceSet(sourceSets.main)
+            sourceSet(coreMain)
         }
     }
 }
@@ -120,6 +125,9 @@ configurations {
 }
 
 dependencies {
+    // Compile-only: core is copied into this jar rather than nested, so its packages live in a single module
+    compileOnly project(':core')
+
     // QR code rendering for KuGou login and MP3 decoding for playback, bundled into the mod jar
     jarJar(implementation("com.google.zxing:core:3.5.3"))
     jarJar(implementation("javazoom:jlayer:1.0.1"))
@@ -127,8 +135,6 @@ dependencies {
     additionalRuntimeClasspath "javazoom:jlayer:1.0.1"
 
     testImplementation "org.junit.jupiter:junit-jupiter:5.11.3"
-    // Minecraft ships Gson at runtime; unit tests need their own copy (same version as MC 1.21.1)
-    testImplementation "com.google.code.gson:gson:2.10.1"
     testRuntimeOnly "org.junit.platform:junit-platform-launcher"
 
     // Example optional mod dependency with JEI
@@ -192,8 +198,9 @@ publishing {
     }
 }
 
-// Ship the license and third-party notices inside the mod jar
+// Ship core's classes, the license and the third-party notices inside the mod jar
 tasks.named('jar', Jar).configure {
+    from(coreMain.output)
     from('LICENSE', 'THIRD_PARTY_NOTICES.md')
 }
 

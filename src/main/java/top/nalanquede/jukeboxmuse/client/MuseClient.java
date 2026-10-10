@@ -22,6 +22,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
 import top.nalanquede.jukeboxmuse.MuseConfig;
 import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.network.MusePayloads.HelloC2S;
+import top.nalanquede.jukeboxmuse.lyrics.Lyrics;
 
 @Mod(value = JukeboxMuse.MODID, dist = Dist.CLIENT)
 public final class MuseClient {

@@ -27,6 +27,7 @@ import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
 import top.nalanquede.jukeboxmuse.common.Song;
 import top.nalanquede.jukeboxmuse.network.MusePayloads.*;
+import top.nalanquede.jukeboxmuse.lyrics.Lyrics;
 
 /**
  * The song request GUI in vanilla container style: creative-inventory tabs with item icons above a gray panel.

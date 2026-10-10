@@ -17,8 +17,8 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.music.Json;
+import top.nalanquede.jukeboxmuse.music.MusicLog;
 
 /**
  * One KuGou API call, mirroring KuGouMusicApi util/request.js createRequest: default device params,
@@ -116,7 +116,7 @@ public final class KugouRequest {
 
     public JsonObject json(KugouAccount account) throws KugouException {
         String text = new String(send(account), StandardCharsets.UTF_8);
-        if (JukeboxMuse.debugLogging()) JukeboxMuse.LOGGER.info("[kugou] {} -> {}", path, text.length() > 4000 ? text.substring(0, 4000) + "..." : text);
+        MusicLog.response("kugou " + path, text);
         JsonElement element;
         try {
             element = JsonParser.parseString(text);

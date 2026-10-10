@@ -39,7 +39,7 @@ public final class MusePayloads {
     public record SearchC2S(Platform platform, String keyword, int page) implements CustomPacketPayload {
         public static final Type<SearchC2S> TYPE = typeOf("search");
         public static final StreamCodec<ByteBuf, SearchC2S> STREAM_CODEC = StreamCodec.composite(
-                Platform.STREAM_CODEC, SearchC2S::platform,
+                MuseCodecs.PLATFORM, SearchC2S::platform,
                 ByteBufCodecs.stringUtf8(64), SearchC2S::keyword,
                 ByteBufCodecs.VAR_INT, SearchC2S::page,
                 SearchC2S::new);
@@ -52,7 +52,7 @@ public final class MusePayloads {
 
     public record RequestSongC2S(Song song) implements CustomPacketPayload {
         public static final Type<RequestSongC2S> TYPE = typeOf("request_song");
-        public static final StreamCodec<ByteBuf, RequestSongC2S> STREAM_CODEC = Song.STREAM_CODEC.map(RequestSongC2S::new, RequestSongC2S::song);
+        public static final StreamCodec<ByteBuf, RequestSongC2S> STREAM_CODEC = MuseCodecs.SONG.map(RequestSongC2S::new, RequestSongC2S::song);
 
         @Override
         public Type<RequestSongC2S> type() {
@@ -85,7 +85,7 @@ public final class MusePayloads {
     /** Start (or re-show) a QR login from the account page. */
     public record LoginStartC2S(LoginMethod method) implements CustomPacketPayload {
         public static final Type<LoginStartC2S> TYPE = typeOf("login_start");
-        public static final StreamCodec<ByteBuf, LoginStartC2S> STREAM_CODEC = LoginMethod.STREAM_CODEC.map(LoginStartC2S::new, LoginStartC2S::method);
+        public static final StreamCodec<ByteBuf, LoginStartC2S> STREAM_CODEC = MuseCodecs.LOGIN_METHOD.map(LoginStartC2S::new, LoginStartC2S::method);
 
         @Override
         public Type<LoginStartC2S> type() {
@@ -95,7 +95,7 @@ public final class MusePayloads {
 
     public record LogoutC2S(Platform platform) implements CustomPacketPayload {
         public static final Type<LogoutC2S> TYPE = typeOf("logout");
-        public static final StreamCodec<ByteBuf, LogoutC2S> STREAM_CODEC = Platform.STREAM_CODEC.map(LogoutC2S::new, LogoutC2S::platform);
+        public static final StreamCodec<ByteBuf, LogoutC2S> STREAM_CODEC = MuseCodecs.PLATFORM.map(LogoutC2S::new, LogoutC2S::platform);
 
         @Override
         public Type<LogoutC2S> type() {
@@ -109,10 +109,10 @@ public final class MusePayloads {
     public record SearchResultS2C(Platform platform, String keyword, int page, List<Song> songs, String error) implements CustomPacketPayload {
         public static final Type<SearchResultS2C> TYPE = typeOf("search_result");
         public static final StreamCodec<ByteBuf, SearchResultS2C> STREAM_CODEC = StreamCodec.composite(
-                Platform.STREAM_CODEC, SearchResultS2C::platform,
+                MuseCodecs.PLATFORM, SearchResultS2C::platform,
                 ByteBufCodecs.STRING_UTF8, SearchResultS2C::keyword,
                 ByteBufCodecs.VAR_INT, SearchResultS2C::page,
-                Song.STREAM_CODEC.apply(ByteBufCodecs.list()), SearchResultS2C::songs,
+                MuseCodecs.SONG.apply(ByteBufCodecs.list()), SearchResultS2C::songs,
                 ByteBufCodecs.STRING_UTF8, SearchResultS2C::error,
                 SearchResultS2C::new);
 
@@ -125,7 +125,7 @@ public final class MusePayloads {
     /** Upcoming songs, excluding the one currently playing. */
     public record QueueS2C(List<QueueEntry> queue) implements CustomPacketPayload {
         public static final Type<QueueS2C> TYPE = typeOf("queue");
-        public static final StreamCodec<ByteBuf, QueueS2C> STREAM_CODEC = QueueEntry.STREAM_CODEC.apply(ByteBufCodecs.list()).map(QueueS2C::new, QueueS2C::queue);
+        public static final StreamCodec<ByteBuf, QueueS2C> STREAM_CODEC = MuseCodecs.QUEUE_ENTRY.apply(ByteBufCodecs.list()).map(QueueS2C::new, QueueS2C::queue);
 
         @Override
         public Type<QueueS2C> type() {
@@ -137,7 +137,7 @@ public final class MusePayloads {
     public record PlayS2C(QueueEntry entry, String url, long elapsedMs, String lyric, String translation) implements CustomPacketPayload {
         public static final Type<PlayS2C> TYPE = typeOf("play");
         public static final StreamCodec<ByteBuf, PlayS2C> STREAM_CODEC = StreamCodec.composite(
-                QueueEntry.STREAM_CODEC, PlayS2C::entry,
+                MuseCodecs.QUEUE_ENTRY, PlayS2C::entry,
                 ByteBufCodecs.STRING_UTF8, PlayS2C::url,
                 ByteBufCodecs.VAR_LONG, PlayS2C::elapsedMs,
                 ByteBufCodecs.STRING_UTF8, PlayS2C::lyric,
@@ -167,7 +167,7 @@ public final class MusePayloads {
      */
     public record AccountInfo(Platform platform, boolean loggedIn, String nickname, boolean vip, String qrContent, String loginState) {
         public static final StreamCodec<ByteBuf, AccountInfo> STREAM_CODEC = StreamCodec.composite(
-                Platform.STREAM_CODEC, AccountInfo::platform,
+                MuseCodecs.PLATFORM, AccountInfo::platform,
                 ByteBufCodecs.BOOL, AccountInfo::loggedIn,
                 ByteBufCodecs.STRING_UTF8, AccountInfo::nickname,
                 ByteBufCodecs.BOOL, AccountInfo::vip,

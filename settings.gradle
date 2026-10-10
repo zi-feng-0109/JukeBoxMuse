@@ -7,3 +7,8 @@ pluginManagement {
 plugins {
     id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
 }
+
+rootProject.name = 'jukeboxmuse'
+
+// Minecraft-independent code (platform clients, lyrics, data types)
+include 'core'

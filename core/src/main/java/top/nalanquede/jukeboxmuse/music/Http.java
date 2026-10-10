@@ -17,7 +17,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-import top.nalanquede.jukeboxmuse.JukeboxMuse;
 
 /**
  * Minimal HTTP for the NetEase and QQ clients. Redirects are never followed: the QQ login reads its
@@ -157,7 +156,7 @@ public final class Http {
         /** The body as a JSON object; tag names the platform in logs. */
         public JsonObject json(String tag) throws MusicException {
             String text = text();
-            if (JukeboxMuse.debugLogging()) JukeboxMuse.LOGGER.info("[{}] -> {}", tag, text.length() > 4000 ? text.substring(0, 4000) + "..." : text);
+            MusicLog.response(tag, text);
             JsonElement element;
             try {
                 element = JsonParser.parseString(text);

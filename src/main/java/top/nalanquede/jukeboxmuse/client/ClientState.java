@@ -8,6 +8,7 @@ import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
 import top.nalanquede.jukeboxmuse.common.Song;
 import top.nalanquede.jukeboxmuse.network.MusePayloads.AccountInfo;
+import top.nalanquede.jukeboxmuse.lyrics.Lyrics;
 
 /** What the client knows about the server's music state. Only touched on the client thread. */
 public final class ClientState {

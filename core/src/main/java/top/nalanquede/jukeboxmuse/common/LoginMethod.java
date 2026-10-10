@@ -1,17 +1,11 @@
 package top.nalanquede.jukeboxmuse.common;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-
 /** The QR code logins the account page offers. QQ Music can be logged into with either a QQ or a WeChat scan. */
 public enum LoginMethod {
     KUGOU(Platform.KUGOU, "扫码登录", "请用酷狗音乐 App 扫描二维码"),
     NETEASE(Platform.NETEASE, "扫码登录", "请用网易云音乐 App 扫描二维码"),
     QQ(Platform.QQ, "QQ 扫码", "请用手机 QQ 扫描二维码"),
     WECHAT(Platform.QQ, "微信扫码", "请用微信扫描二维码（微信需绑定 QQ 音乐）");
-
-    public static final StreamCodec<ByteBuf, LoginMethod> STREAM_CODEC = ByteBufCodecs.idMapper(i -> values()[i], LoginMethod::ordinal);
 
     private final Platform platform;
     private final String buttonLabel;
