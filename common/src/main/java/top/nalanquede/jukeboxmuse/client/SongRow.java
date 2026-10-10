@@ -39,7 +39,7 @@ final class SongRow extends AbstractButton {
 
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        g.blitSprite(SPRITES.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
+        g.blitSprite(McGui.BUTTON.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
         g.renderItem(McGui.disc(song.platform()), getX() + 2, getY() + (getHeight() - 16) / 2);
 
         int textY = getY() + (getHeight() - 8) / 2;

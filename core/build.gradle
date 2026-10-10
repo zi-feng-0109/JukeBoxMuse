@@ -1,13 +1,7 @@
 // Minecraft-independent code shared by every loader and game version: the KuGou / NetEase / QQ Music clients,
-// lyric parsing and the data types the mod sends around. Must never depend on Minecraft or a mod loader.
+// settings, lyric parsing and the data types the mod sends around. Must never depend on Minecraft or a mod loader.
 plugins {
-    id 'java-library'
-}
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
-
-repositories {
-    mavenCentral()
+    id 'jukeboxmuse.java'
 }
 
 dependencies {
@@ -28,8 +22,4 @@ tasks.named('test', Test) {
     useJUnitPlatform()
     // LiveApiTest only runs with JUKEBOXMUSE_LIVE=1; it must see the variable even from a long-lived daemon
     environment 'JUKEBOXMUSE_LIVE', System.getenv('JUKEBOXMUSE_LIVE') ?: ''
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.encoding = 'UTF-8'
 }

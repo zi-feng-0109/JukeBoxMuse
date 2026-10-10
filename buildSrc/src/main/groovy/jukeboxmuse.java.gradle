@@ -1,0 +1,34 @@
+// Every subproject: Java 21 (what Minecraft 1.21.1 ships), UTF-8 sources, the mod's version and group.
+plugins {
+    id 'java-library'
+}
+
+version = mod_version
+group = mod_group_id
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    mavenCentral()
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+// core and common hand their source directories to the loader projects, which compile them into their own jar
+configurations {
+    sharedJava {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+    sharedResources {
+        canBeResolved = false
+        canBeConsumed = true
+    }
+}
+
+artifacts {
+    sharedJava sourceSets.main.java.sourceDirectories.singleFile
+    sharedResources sourceSets.main.resources.sourceDirectories.singleFile
+}

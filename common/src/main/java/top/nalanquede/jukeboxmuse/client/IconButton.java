@@ -33,7 +33,7 @@ final class IconButton extends AbstractButton {
     protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        g.blitSprite(SPRITES.get(active, selected || isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
+        g.blitSprite(McGui.BUTTON.get(active, selected || isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
         g.renderItem(icon, getX() + (getWidth() - 16) / 2, getY() + (getHeight() - 16) / 2);
         if (!active) {
             // Dim the item of a platform that cannot be used; items draw at z 150+, so lift the overlay above them

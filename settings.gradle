@@ -10,5 +10,9 @@ plugins {
 
 rootProject.name = 'jukeboxmuse'
 
-// Minecraft-independent code (platform clients, lyrics, data types)
+// core: plain Java (platform clients, settings, lyrics, data types)
+// common: vanilla Minecraft code shared by the loaders
+// neoforge: the NeoForge mod
 include 'core'
+include 'common'
+include 'neoforge'

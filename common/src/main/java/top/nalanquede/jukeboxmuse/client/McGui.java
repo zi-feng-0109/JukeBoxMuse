@@ -2,6 +2,8 @@ package top.nalanquede.jukeboxmuse.client;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import top.nalanquede.jukeboxmuse.common.Platform;
@@ -11,6 +13,12 @@ final class McGui {
     /** Container label colour (the "Inventory" text). */
     static final int LABEL = 0xFF404040;
     static final int LABEL_DIM = 0xFF707070;
+
+    /** The vanilla button sprites (AbstractButton.SPRITES is private in vanilla; only NeoForge widens it). */
+    static final WidgetSprites BUTTON = new WidgetSprites(
+            ResourceLocation.withDefaultNamespace("widget/button"),
+            ResourceLocation.withDefaultNamespace("widget/button_disabled"),
+            ResourceLocation.withDefaultNamespace("widget/button_highlighted"));
 
     private static final int PANEL = 0xFFC6C6C6;
     private static final int HIGHLIGHT = 0xFFFFFFFF;
