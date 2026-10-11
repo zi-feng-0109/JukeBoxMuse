@@ -1,6 +1,6 @@
 # Modrinth / CurseForge 项目页文案
 
-建项目时按下面几段填写。正文（「正文」一节）两个平台都支持 Markdown，整段粘贴即可。
+建项目时按下面几段填写。两个平台用同一份正文（Markdown）。
 
 ## 项目名称
 
@@ -17,9 +17,38 @@ In-game song requests from KuGou, NetEase Cloud Music and QQ Music, synced for t
 ## 分类建议
 
 - Modrinth：Utility、Social（客户端 + 服务端都需要：Client side **required**、Server side **required**）
-- CurseForge：Server Utility、Miscellaneous
+- CurseForge：Class 选 Mods，主分类 Server Utility，附加分类 Utility & QoL；Summary 必须是英文（只用上面英文那半句），正文英文部分放在前面
 
-## 正文
+## 正文（两个平台通用，复制代码块里的全部内容）
+
+CurseForge 和 Modrinth 都要求正文是英文或带英文翻译，所以英文放在前面、中文跟在后面。CurseForge 的编辑器要先切到 Markdown 模式再粘贴。
+
+```markdown
+**Jukebox Muse** brings song requests into Minecraft: search songs on KuGou, NetEase Cloud Music and QQ Music, and the whole server listens together, with scrolling lyrics and album covers.
+
+> ⚠️ **Unofficial project.** Not affiliated with or endorsed by KuGou, NetEase Cloud Music or QQ Music / Tencent. It works through the platforms' unofficial APIs, which may change and break features at any time. For learning and personal use only — please respect each platform's terms of service and support the artists.
+
+### Features
+
+- Three platforms: KuGou, NetEase Cloud Music and QQ Music
+- Server-wide sync: everyone hears the same song at the same position, including players who join mid-song
+- Request queue with skip / remove, and server-side limits on cooldown and queue size
+- Log in by scanning a QR code right inside the game (QQ Music: QQ or WeChat)
+- Scrolling lyrics with translations, optionally shown at the top of the screen
+- Album covers as spinning vinyl records
+- Vanilla-style screens: container panel, creative-inventory tabs, a music disc per platform
+
+### Installation
+
+Required on **both server and client** (single player: client only). The Fabric version needs Fabric API.
+
+### Usage
+
+Press **K** to open the screen. An operator logs in on the Account tab (a secondary account is recommended, as the whole server shares it), then anyone can search and request songs. Commands: `/muse status`, `/muse skip`, `/muse clear`.
+
+Note: the interface is in Chinese, as are the supported music platforms.
+
+License: GPL-3.0-or-later · Source & issues: [GitHub](https://github.com/zi-feng-0109/JukeBoxMuse)
 
 ---
 
@@ -37,46 +66,11 @@ In-game song requests from KuGou, NetEase Cloud Music and QQ Music, synced for t
 - 💿 **专辑封面**：以旋转的黑胶唱片显示
 - 🧱 **原版风格界面**：灰色容器面板、创造模式式标签页，每个平台对应一张原版唱片
 
-### 安装
+### 安装与使用
 
-- **服务端和客户端都必须安装**，且版本一致（单人游戏只需装在客户端）
-- Fabric 版需要 [Fabric API](https://modrinth.com/mod/fabric-api)
-
-### 使用
-
-1. 按 **K** 打开点歌界面
-2. 管理员在「账号」页选择平台，扫码登录（建议用小号：全服共用这个账号）
-3. 在「搜索点歌」页搜歌，点一下即可加入队列
-
-指令：`/muse status`、`/muse skip`、`/muse clear`（`/muse` 等同于 `/jukeboxmuse`）
-
-### 说明
-
-- 平台只提供登录账号能听的版本：VIP 歌曲在非 VIP 账号下通常只有试听片段，这类歌会自动跳过
+- **服务端和客户端都必须安装**，且版本一致（单人游戏只需装在客户端）；Fabric 版需要 Fabric API
+- 按 **K** 打开点歌界面；管理员在「账号」页选择平台扫码登录（建议用小号）；在「搜索点歌」页搜歌，点一下即可加入队列
+- 指令：`/muse status`、`/muse skip`、`/muse clear`
+- VIP 歌曲在非 VIP 账号下通常只有试听片段，这类歌会自动跳过
 - 设置文件在 `config/jukeboxmuse/`；同目录下的账号文件保存着登录凭证，请勿分享
-
-开源许可：GPL-3.0-or-later · 源码与问题反馈：[GitHub](https://github.com/zi-feng-0109/JukeBoxMuse)
-
----
-
-**Jukebox Muse** brings song requests into Minecraft: search songs on KuGou, NetEase Cloud Music and QQ Music, and the whole server listens together, with scrolling lyrics and album covers.
-
-> ⚠️ **Unofficial project.** Not affiliated with or endorsed by KuGou, NetEase Cloud Music or QQ Music / Tencent. It works through the platforms' unofficial APIs, which may change and break features at any time. For learning and personal use only — please respect each platform's terms of service and support the artists.
-
-**Features**
-
-- Three platforms: KuGou, NetEase Cloud Music and QQ Music
-- Server-wide sync: everyone hears the same song at the same position, including players who join mid-song
-- Request queue with skip / remove, and server-side limits on cooldown and queue size
-- Log in by scanning a QR code right inside the game (QQ Music: QQ or WeChat)
-- Scrolling lyrics with translations, optionally shown at the top of the screen
-- Album covers as spinning vinyl records
-- Vanilla-style screens: container panel, creative-inventory tabs, a music disc per platform
-
-**Installation:** required on **both server and client** (single player: client only). The Fabric version needs [Fabric API](https://modrinth.com/mod/fabric-api).
-
-**Usage:** press **K** to open the screen. An operator logs in on the Account tab (a secondary account is recommended, as the whole server shares it), then anyone can search and request songs. Commands: `/muse status`, `/muse skip`, `/muse clear`.
-
-Note: the interface is in Chinese, as are the supported music platforms.
-
-License: GPL-3.0-or-later · Source & issues: [GitHub](https://github.com/zi-feng-0109/JukeBoxMuse)
+```
