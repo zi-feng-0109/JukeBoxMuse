@@ -82,6 +82,14 @@
 IDE 里 `src/` 同一时间只对应一个版本（`stonecutter.gradle.kts` 里的 `active`），用 Gradle 任务 `Set active project to ...` 切换；提交前运行 `Reset active project` 切回默认版本。
 每个版本用到的 MC、加载器、依赖版本写在 `stonecutter.properties.toml`，支持的版本列表在 `settings.gradle.kts`。
 
+测试：
+
+```
+./gradlew :core:test                          # 平台接口、歌词等单元测试
+./gradlew :1.21.11-fabric:runClientGameTest   # 自动打开点歌界面各页并截图（Fabric 1.21.4+），截图在 versions/<节点>/build/run/clientGameTest/screenshots/
+scripts/smoke-test.sh 1.21.11-neoforge 1.21.11-fabric   # 启动专用服务器、客户端自动加入，检查两边日志（Git Bash）
+```
+
 项目结构：
 
 | 目录 | 内容 |
