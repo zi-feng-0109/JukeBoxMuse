@@ -7,6 +7,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.resources.ResourceLocation;
 import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.config.ClientSettings;
 import top.nalanquede.jukeboxmuse.lyrics.Lyrics;
@@ -15,8 +16,13 @@ import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 
 /** Client behaviour the loaders' events forward to. */
 public final class ClientHooks {
+    //? if >=1.21.9 {
+    /*// The mod's section of the controls screen; registered by each loader
+    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(JukeboxMuse.MODID, "main"));
+    *///?}
     /** Registered by each loader. */
-    public static final KeyMapping OPEN_KEY = new KeyMapping("key.jukeboxmuse.open", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K, "key.categories.jukeboxmuse");
+    public static final KeyMapping OPEN_KEY = new KeyMapping("key.jukeboxmuse.open", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,
+            /*? if >=1.21.9 {*//*CATEGORY*//*?} else {*/"key.categories.jukeboxmuse"/*?}*/);
 
     private ClientHooks() {
     }

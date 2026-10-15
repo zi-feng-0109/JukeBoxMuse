@@ -17,6 +17,8 @@ public final class JukeboxMuseFabricClient implements ClientModInitializer {
     public void onInitializeClient() {
         FabricServices.clientSender = ClientPlayNetworking::send;
         ClientHooks.init();
+        //? if >=1.21.9
+        /*net.minecraft.client.KeyMapping.Category.register(ClientHooks.CATEGORY.id());*/
         KeyBindingHelper.registerKeyBinding(ClientHooks.OPEN_KEY);
 
         // Fabric runs play receivers on the client thread

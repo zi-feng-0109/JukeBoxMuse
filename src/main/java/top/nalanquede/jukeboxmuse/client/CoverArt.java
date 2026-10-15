@@ -16,9 +16,6 @@ import java.util.concurrent.Executors;
 import javax.imageio.ImageIO;
 
 import com.mojang.blaze3d.platform.NativeImage;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -72,20 +69,16 @@ public final class CoverArt {
     /** Draws song's cover as a record of size×size at (x, y), turned by degrees around its centre. */
     public static void renderDisc(GuiGraphics g, Song song, int x, int y, int size, float degrees) {
         ResourceLocation texture = texture(song.coverUrl());
-        PoseStack pose = g.pose();
-        pose.pushPose();
-        pose.translate(x + size / 2f, y + size / 2f, 0);
-        pose.mulPose(Axis.ZP.rotationDegrees(degrees));
+        McGui.push(g);
+        McGui.translate(g, x + size / 2f, y + size / 2f);
+        McGui.rotate(g, degrees);
         if (texture != null) {
-            RenderSystem.enableBlend();
-            g.blit(texture, -size / 2, -size / 2, size, size, 0, 0, VinylImage.SIZE, VinylImage.SIZE, VinylImage.SIZE, VinylImage.SIZE);
-            RenderSystem.disableBlend();
+            McGui.texture(g, texture, -size / 2, -size / 2, size, size, VinylImage.SIZE, VinylImage.SIZE);
         } else {
-            float scale = size / 16f;
-            pose.scale(scale, scale, 1);
+            McGui.scale(g, size / 16f);
             g.renderItem(McGui.disc(song.platform()), -8, -8);
         }
-        pose.popPose();
+        McGui.pop(g);
     }
 
     private static void load(String url, Entry entry) {
@@ -113,13 +106,29 @@ public final class CoverArt {
         NativeImage image = new NativeImage(VinylImage.SIZE, VinylImage.SIZE, true);
         for (int i = 0; i < argb.length; i++) {
             int p = argb[i];
+            //? if >=1.21.2 {
+            /*image.setPixel(i % VinylImage.SIZE, i / VinylImage.SIZE, p);
+            *///?} else {
             // NativeImage wants ABGR
             int abgr = p & 0xFF00FF00 | (p & 0xFF) << 16 | p >> 16 & 0xFF;
             image.setPixelRGBA(i % VinylImage.SIZE, i / VinylImage.SIZE, abgr);
+            //?}
         }
+        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JukeboxMuse.MODID, "cover/" + nextId++);
+        // Smooth (linear) scaling, without mipmaps
+        //? if >=1.21.11 {
+        /*DynamicTexture texture = new DynamicTexture(id::toString, image) {
+            {
+                sampler = com.mojang.blaze3d.systems.RenderSystem.getSamplerCache().getClampToEdge(com.mojang.blaze3d.textures.FilterMode.LINEAR);
+            }
+        };
+        *///?} elif >=1.21.5 {
+        /*DynamicTexture texture = new DynamicTexture(id::toString, image);
+        texture.setFilter(true, false);
+        *///?} else {
         DynamicTexture texture = new DynamicTexture(image);
         texture.setFilter(true, false);
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JukeboxMuse.MODID, "cover/" + nextId++);
+        //?}
         Minecraft.getInstance().getTextureManager().register(id, texture);
         entry.texture = id;
     }

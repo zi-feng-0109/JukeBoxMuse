@@ -25,6 +25,9 @@ final class SongRow extends AbstractButton {
     }
 
     @Override
+    //? if >=1.21.9 {
+    /*public void onPress(net.minecraft.client.input.InputWithModifiers input) {
+    *///?} else
     public void onPress() {
         if (ClientState.trackState(song) != ClientState.TrackState.NONE) return;
         ClientState.markPending(song);
@@ -32,14 +35,20 @@ final class SongRow extends AbstractButton {
     }
 
     @Override
+    //? if >=1.21.11 {
+    /*protected void renderContents(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    *///?} else
     protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         Font font = Minecraft.getInstance().font;
         ClientState.TrackState state = ClientState.trackState(song);
         active = state == ClientState.TrackState.NONE;
 
+        // From 1.21.2 the sprite's render type sets up blending itself
+        //? if <1.21.2 {
         RenderSystem.enableBlend();
         RenderSystem.enableDepthTest();
-        g.blitSprite(McGui.BUTTON.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
+        //?}
+        McGui.sprite(g, McGui.BUTTON.get(active, isHoveredOrFocused()), getX(), getY(), getWidth(), getHeight());
         g.renderItem(McGui.disc(song.platform()), getX() + 2, getY() + (getHeight() - 16) / 2);
 
         int textY = getY() + (getHeight() - 8) / 2;

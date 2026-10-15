@@ -1,0 +1,14 @@
+{
+  "schemaVersion": 1,
+  "id": "jukeboxmuse-test",
+  "version": "1.0.0",
+  "name": "Jukebox Muse client game tests",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-client-gametest": ["top.nalanquede.jukeboxmuse.test.MuseClientGameTest"]
+  },
+  "depends": {
+    "jukeboxmuse": "*",
+    "fabric-client-gametest-api-v1": "*"
+  }
+}

@@ -48,13 +48,33 @@ dependencies {
     include(implementation("javazoom:jlayer:${project.property("deps.jlayer")}")!!)
 }
 
+// Client game tests (src/gametest/): `runClientGameTest` starts the game, drives the music screen and saves
+// screenshots. Fabric API has them from 1.21.4 on.
+if (sc.current.parsed >= "1.21.4") {
+    fabricApi.configureTests {
+        createSourceSet = true
+        modId = "$modId-test"
+        enableGameTests = false
+        enableClientGameTests = true
+        eula = true
+    }
+}
+
 loom {
     runConfigs.all {
         ideConfigGenerated(true)
-        // Shared by every node; the game keeps config/jukeboxmuse/ (settings, logged-in accounts) here
-        runDir = "../../run/$environment"
+        // Shared by every node; the game keeps config/jukeboxmuse/ (settings, logged-in accounts) here.
+        // The game tests get a throwaway directory of their own (screenshots end up in its screenshots/).
+        runDir = if (name == "clientGameTest") "build/run/clientGameTest" else "../../run/$environment"
         appendProjectPathToConfigName = false
-        configName = "Fabric ${environment.replaceFirstChar(Char::uppercase)} $minecraft"
+        configName = if (name == "clientGameTest") "Fabric Client Game Test $minecraft"
+        else "Fabric ${environment.replaceFirstChar(Char::uppercase)} $minecraft"
+    }
+    // A world per version: worlds only upgrade, so an older server cannot open a newer one's world
+    runConfigs.named("server") { programArgs("--world", "world-$minecraft") }
+    // -Pjukeboxmuse.join=<address>: the client joins that server on start (scripts/smoke-test.sh)
+    providers.gradleProperty("jukeboxmuse.join").orNull?.let { address ->
+        runConfigs.named("client") { programArgs("--quickPlayMultiplayer", address) }
     }
 }
 

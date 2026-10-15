@@ -1,8 +1,15 @@
 package top.nalanquede.jukeboxmuse.client;
 
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Axis;
+
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.WidgetSprites;
+//? if <1.21.6
+import net.minecraft.client.renderer.RenderType;
+//? if >=1.21.6
+/*import net.minecraft.client.renderer.RenderPipelines;*/
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -41,6 +48,77 @@ final class McGui {
             case NETEASE -> NETEASE_DISC;
             case QQ -> QQ_DISC;
         };
+    }
+
+    /** A GUI sprite (textures/gui/sprites/), stretched or nine-sliced to w×h. */
+    static void sprite(GuiGraphics g, ResourceLocation sprite, int x, int y, int w, int h) {
+        //? if >=1.21.6 {
+        /*g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, w, h);
+        *///?} elif >=1.21.2 {
+        /*g.blitSprite(RenderType::guiTextured, sprite, x, y, w, h);
+        *///?} else
+        g.blitSprite(sprite, x, y, w, h);
+    }
+
+    /** The w×h region at (u, v) of a spriteW×spriteH GUI sprite, unscaled at (x, y). */
+    static void spritePart(GuiGraphics g, ResourceLocation sprite, int spriteW, int spriteH, int u, int v, int x, int y, int w, int h) {
+        //? if >=1.21.6 {
+        /*g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, spriteW, spriteH, u, v, x, y, w, h);
+        *///?} elif >=1.21.2 {
+        /*g.blitSprite(RenderType::guiTextured, sprite, spriteW, spriteH, u, v, x, y, w, h);
+        *///?} else
+        g.blitSprite(sprite, spriteW, spriteH, u, v, x, y, w, h);
+    }
+
+    /** A whole texW×texH texture (not a sprite), scaled to w×h at (x, y), with transparency. */
+    static void texture(GuiGraphics g, ResourceLocation texture, int x, int y, int w, int h, int texW, int texH) {
+        //? if >=1.21.6 {
+        /*g.blit(RenderPipelines.GUI_TEXTURED, texture, x, y, 0, 0, w, h, texW, texH, texW, texH);
+        *///?} elif >=1.21.2 {
+        /*g.blit(RenderType::guiTextured, texture, x, y, 0, 0, w, h, texW, texH, texW, texH);
+        *///?} else {
+        RenderSystem.enableBlend();
+        g.blit(texture, x, y, w, h, 0, 0, texW, texH, texW, texH);
+        RenderSystem.disableBlend();
+        //?}
+    }
+
+    // 2D transforms of the GUI pose; from 1.21.6 it is a 2D matrix stack without a z axis
+
+    static void push(GuiGraphics g) {
+        //? if >=1.21.6 {
+        /*g.pose().pushMatrix();
+        *///?} else
+        g.pose().pushPose();
+    }
+
+    static void pop(GuiGraphics g) {
+        //? if >=1.21.6 {
+        /*g.pose().popMatrix();
+        *///?} else
+        g.pose().popPose();
+    }
+
+    static void translate(GuiGraphics g, float x, float y) {
+        //? if >=1.21.6 {
+        /*g.pose().translate(x, y);
+        *///?} else
+        g.pose().translate(x, y, 0);
+    }
+
+    static void scale(GuiGraphics g, float scale) {
+        //? if >=1.21.6 {
+        /*g.pose().scale(scale, scale);
+        *///?} else
+        g.pose().scale(scale, scale, 1);
+    }
+
+    /** Clockwise on screen, like vanilla's Axis.ZP rotations. */
+    static void rotate(GuiGraphics g, float degrees) {
+        //? if >=1.21.6 {
+        /*g.pose().rotate((float) Math.toRadians(degrees));
+        *///?} else
+        g.pose().mulPose(Axis.ZP.rotationDegrees(degrees));
     }
 
     /** Raised gray panel with the rounded black outline of container screens. */

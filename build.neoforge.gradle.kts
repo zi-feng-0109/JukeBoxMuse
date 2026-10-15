@@ -41,10 +41,13 @@ neoForge {
             // Shared by every node; the game keeps config/jukeboxmuse/ (settings, logged-in accounts) here
             gameDirectory = rootProject.file("run/client")
             ideName = "NeoForge Client $minecraft"
+            // -Pjukeboxmuse.join=<address>: the client joins that server on start (scripts/smoke-test.sh)
+            providers.gradleProperty("jukeboxmuse.join").orNull?.let { programArguments.addAll("--quickPlayMultiplayer", it) }
         }
         register("server") {
             server()
-            programArgument("--nogui")
+            // A world per version: worlds only upgrade, so an older server cannot open a newer one's world
+            programArguments.addAll("--nogui", "--world", "world-$minecraft")
             gameDirectory = rootProject.file("run/server")
             ideName = "NeoForge Server $minecraft"
         }
@@ -61,8 +64,11 @@ dependencies {
     // Gson and SLF4J come with Minecraft; these are bundled into the mod jar
     jarJar(implementation("com.google.zxing:core:${project.property("deps.zxing")}")!!)
     jarJar(implementation("javazoom:jlayer:${project.property("deps.jlayer")}")!!)
-    "additionalRuntimeClasspath"("com.google.zxing:core:${project.property("deps.zxing")}")
-    "additionalRuntimeClasspath"("javazoom:jlayer:${project.property("deps.jlayer")}")
+    // Before 1.21.9 the game in runClient only sees libraries on this extra classpath
+    if (sc.current.parsed < "1.21.9") {
+        "additionalRuntimeClasspath"("com.google.zxing:core:${project.property("deps.zxing")}")
+        "additionalRuntimeClasspath"("javazoom:jlayer:${project.property("deps.jlayer")}")
+    }
 }
 
 java {

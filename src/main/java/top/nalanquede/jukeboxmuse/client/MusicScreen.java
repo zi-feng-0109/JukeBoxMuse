@@ -193,8 +193,8 @@ public class MusicScreen extends Screen {
         int barY = top + 66;
         long dur = Math.max(1, s.durationMs());
         int filled = (int) (XP_W * Math.min(1.0, pos / (double) dur));
-        g.blitSprite(XP_BACKGROUND, tx, barY, XP_W, 5);
-        if (filled > 0) g.blitSprite(XP_PROGRESS, XP_W, 5, 0, 0, tx, barY, filled, 5);
+        McGui.sprite(g, XP_BACKGROUND, tx, barY, XP_W, 5);
+        if (filled > 0) McGui.spritePart(g, XP_PROGRESS, XP_W, 5, 0, 0, tx, barY, filled, 5);
         McGui.label(g, font, SongRow.time(pos) + " / " + SongRow.time(s.durationMs()), tx + XP_W + 6, barY - 2, McGui.LABEL);
 
         renderLyrics(g, pos);
@@ -327,7 +327,7 @@ public class MusicScreen extends Screen {
     private void initQueue() {
         List<QueueEntry> queue = ClientState.queue;
         queueScroll = clampScroll(queueScroll, queue.size(), QUEUE_ROWS);
-        String me = minecraft.player == null ? "" : minecraft.player.getGameProfile().getName();
+        String me = minecraft.player == null ? "" : minecraft.player.getScoreboardName();
         for (int i = 0; i < QUEUE_ROWS && queueScroll + i < queue.size(); i++) {
             int index = queueScroll + i;
             QueueEntry e = queue.get(index);
@@ -357,7 +357,7 @@ public class MusicScreen extends Screen {
             g.drawCenteredString(font, "队列是空的", x + listWidth() / 2, listRowY(QUEUE_LIST_TOP, 3) + 6, 0xFFFFFFFF);
             return;
         }
-        String me = minecraft.player == null ? "" : minecraft.player.getGameProfile().getName();
+        String me = minecraft.player == null ? "" : minecraft.player.getScoreboardName();
         for (int i = 0; i < QUEUE_ROWS && queueScroll + i < queue.size(); i++) {
             QueueEntry e = queue.get(queueScroll + i);
             int y = listRowY(QUEUE_LIST_TOP, i);
@@ -410,7 +410,7 @@ public class MusicScreen extends Screen {
     }
 
     private void renderAccountBackground(GuiGraphics g) {
-        g.blit(MAP_BACKGROUND, mapX(), top + 20, MAP_SIZE, MAP_SIZE, 0, 0, 64, 64, 64, 64);
+        McGui.texture(g, MAP_BACKGROUND, mapX(), top + 20, MAP_SIZE, MAP_SIZE, 64, 64);
     }
 
     private void renderAccount(GuiGraphics g) {
@@ -468,7 +468,7 @@ public class MusicScreen extends Screen {
         McGui.inset(g, sx, y, SCROLLBAR_W, h);
         int max = size - rows;
         int sy = y + 1 + (max <= 0 ? 0 : (h - 2 - SCROLLER_H) * scroll / max);
-        g.blitSprite(max > 0 ? SCROLLER : SCROLLER_DISABLED, sx + 1, sy, 12, SCROLLER_H);
+        McGui.sprite(g, max > 0 ? SCROLLER : SCROLLER_DISABLED, sx + 1, sy, 12, SCROLLER_H);
     }
 
     private int scrollbarX() {
@@ -547,7 +547,7 @@ public class MusicScreen extends Screen {
 
     private void renderTab(GuiGraphics g, int i, boolean selected) {
         String sprite = "container/creative_inventory/tab_top_" + (selected ? "selected_" : "unselected_") + (i + 1);
-        g.blitSprite(ResourceLocation.withDefaultNamespace(sprite), tabX(i), top - TAB_RISE, TAB_W, TAB_H);
+        McGui.sprite(g, ResourceLocation.withDefaultNamespace(sprite), tabX(i), top - TAB_RISE, TAB_W, TAB_H);
     }
 
     private int tabX(int i) {
@@ -572,7 +572,12 @@ public class MusicScreen extends Screen {
         }
         Tab[] tabs = tabs();
         for (int i = 0; i < tabs.length; i++) {
-            if (overTab(i, mouseX, mouseY)) g.renderTooltip(font, Component.literal(tabs[i].title), mouseX, mouseY);
+            if (overTab(i, mouseX, mouseY)) {
+                //? if >=1.21.6 {
+                /*g.setTooltipForNextFrame(font, Component.literal(tabs[i].title), mouseX, mouseY);
+                *///?} else
+                g.renderTooltip(font, Component.literal(tabs[i].title), mouseX, mouseY);
+            }
         }
     }
 
@@ -580,8 +585,54 @@ public class MusicScreen extends Screen {
         return mouseX >= tabX(i) && mouseX < tabX(i) + TAB_W && mouseY >= top - TAB_RISE && mouseY < top;
     }
 
+    // Input. From 1.21.9 Screen takes event records; the overrides unpack them for these handlers.
+
+    //? if >=1.21.9 {
+    /*@Override
+    public boolean mouseClicked(net.minecraft.client.input.MouseButtonEvent event, boolean doubleClick) {
+        return clicked(event.x(), event.y(), event.button()) || super.mouseClicked(event, doubleClick);
+    }
+
+    @Override
+    public boolean mouseDragged(net.minecraft.client.input.MouseButtonEvent event, double dragX, double dragY) {
+        return dragged(event.x(), event.y()) || super.mouseDragged(event, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(net.minecraft.client.input.MouseButtonEvent event) {
+        draggingScroller = false;
+        return super.mouseReleased(event);
+    }
+
+    @Override
+    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
+        return pressed(event.key(), ClientHooks.OPEN_KEY.matches(event)) || super.keyPressed(event);
+    }
+    *///?} else {
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
+        return clicked(mouseX, mouseY, button) || super.mouseClicked(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
+        return dragged(mouseX, mouseY) || super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
+    }
+
+    @Override
+    public boolean mouseReleased(double mouseX, double mouseY, int button) {
+        draggingScroller = false;
+        return super.mouseReleased(mouseX, mouseY, button);
+    }
+
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
+        return pressed(keyCode, ClientHooks.OPEN_KEY.matches(keyCode, scanCode)) || super.keyPressed(keyCode, scanCode, modifiers);
+    }
+    //?}
+
+    /** Tabs and the scrollbars; true when the click was used. */
+    private boolean clicked(double mouseX, double mouseY, int button) {
         Tab[] tabs = tabs();
         for (int i = 0; i < tabs.length; i++) {
             if (button == 0 && overTab(i, mouseX, mouseY)) {
@@ -599,23 +650,15 @@ public class MusicScreen extends Screen {
             scrollTo(mouseY, list);
             return true;
         }
-        return super.mouseClicked(mouseX, mouseY, button);
+        return false;
     }
 
-    @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double dragX, double dragY) {
-        if (draggingScroller) {
-            int[] list = scrollbarAt(mouseX, mouseY);
-            if (list != null) scrollTo(mouseY, list);
-            return true;
-        }
-        return super.mouseDragged(mouseX, mouseY, button, dragX, dragY);
-    }
-
-    @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        draggingScroller = false;
-        return super.mouseReleased(mouseX, mouseY, button);
+    /** Dragging a scrollbar; true when the drag was used. */
+    private boolean dragged(double mouseX, double mouseY) {
+        if (!draggingScroller) return false;
+        int[] list = scrollbarAt(mouseX, mouseY);
+        if (list != null) scrollTo(mouseY, list);
+        return true;
     }
 
     @Override
@@ -632,22 +675,20 @@ public class MusicScreen extends Screen {
         return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
     }
 
-    @Override
-    public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        if (tab == Tab.SEARCH && searchBox != null && searchBox.isFocused()
-                && (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)) {
+    /** Enter to search, and the open-screen key to close; true when the key was used. */
+    private boolean pressed(int keyCode, boolean openKey) {
+        boolean typing = tab == Tab.SEARCH && searchBox != null && searchBox.isFocused();
+        if (typing && (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)) {
             doSearch(1);
             return true;
         }
         // Don't let the open-screen key close the screen while typing
-        if (tab == Tab.SEARCH && searchBox != null && searchBox.isFocused() && keyCode != GLFW.GLFW_KEY_ESCAPE) {
-            return super.keyPressed(keyCode, scanCode, modifiers);
-        }
-        if (ClientHooks.OPEN_KEY.matches(keyCode, scanCode)) {
+        if (typing && keyCode != GLFW.GLFW_KEY_ESCAPE) return false;
+        if (openKey) {
             onClose();
             return true;
         }
-        return super.keyPressed(keyCode, scanCode, modifiers);
+        return false;
     }
 
     @Override
@@ -656,11 +697,11 @@ public class MusicScreen extends Screen {
     }
 
     private static void renderScaledItem(GuiGraphics g, ItemStack stack, int x, int y, float scale) {
-        g.pose().pushPose();
-        g.pose().translate(x, y, 0);
-        g.pose().scale(scale, scale, 1);
+        McGui.push(g);
+        McGui.translate(g, x, y);
+        McGui.scale(g, scale);
         g.renderItem(stack, 0, 0);
-        g.pose().popPose();
+        McGui.pop(g);
     }
 
     private static final class VolumeSlider extends AbstractSliderButton {

@@ -244,7 +244,7 @@ public final class MusicService {
     }
 
     public void request(ServerPlayer player, Song song) {
-        String name = player.getGameProfile().getName();
+        String name = player.getScoreboardName();
         long now = System.currentTimeMillis();
         boolean manager = canManage(player);
         if (!providers.get(song.platform()).isLoggedIn()) {
@@ -285,8 +285,8 @@ public final class MusicService {
             return;
         }
         ServerPlayer player = source.getPlayer();
-        boolean own = current != null && player != null && current.requester().equals(player.getGameProfile().getName());
-        boolean manager = source.hasPermission(2) || player != null && canManage(player);
+        boolean own = current != null && player != null && current.requester().equals(player.getScoreboardName());
+        boolean manager = isGameMaster(source) || player != null && canManage(player);
         if (!own && !manager) {
             source.sendFailure(Component.literal("只有管理员或点歌的人可以切歌"));
             return;
@@ -299,7 +299,7 @@ public final class MusicService {
     public void remove(ServerPlayer player, int index) {
         if (index < 0 || index >= queue.size()) return;
         QueueEntry target = new ArrayList<>(queue).get(index);
-        if (!target.requester().equals(player.getGameProfile().getName()) && !canManage(player)) {
+        if (!target.requester().equals(player.getScoreboardName()) && !canManage(player)) {
             fail(player, "只能删除自己点的歌");
             return;
         }
@@ -380,7 +380,25 @@ public final class MusicService {
 
     /** OPs, and the owner of a single-player world even without cheats, may manage the accounts. */
     public boolean canManage(ServerPlayer player) {
-        return player.hasPermissions(2) || server.isSingleplayerOwner(player.getGameProfile());
+        //? if >=1.21.9 {
+        /*return isGameMaster(player) || server.isSingleplayerOwner(player.nameAndId());
+        *///?} else
+        return isGameMaster(player) || server.isSingleplayerOwner(player.getGameProfile());
+    }
+
+    /** Permission level 2, what /op gives by default and vanilla's game-master commands need. */
+    public static boolean isGameMaster(CommandSourceStack source) {
+        //? if >=1.21.11 {
+        /*return source.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER);
+        *///?} else
+        return source.hasPermission(2);
+    }
+
+    public static boolean isGameMaster(ServerPlayer player) {
+        //? if >=1.21.11 {
+        /*return player.permissions().hasPermission(net.minecraft.server.permissions.Permissions.COMMANDS_GAMEMASTER);
+        *///?} else
+        return player.hasPermissions(2);
     }
 
     /** Started from the account page: fetches a QR code for method, then polls it from tick(). */

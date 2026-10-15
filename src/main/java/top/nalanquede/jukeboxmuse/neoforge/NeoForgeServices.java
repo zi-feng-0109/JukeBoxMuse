@@ -17,6 +17,9 @@ final class NeoForgeServices implements LoaderServices {
 
     @Override
     public void sendToServer(CustomPacketPayload payload) {
+        //? if >=1.21.6 {
+        net.neoforged.neoforge.client.network.ClientPacketDistributor.sendToServer(payload);
+        //?} else
         PacketDistributor.sendToServer(payload);
     }
 

@@ -19,7 +19,7 @@ public final class MuseCommands {
     }
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
-        LiteralArgumentBuilder<CommandSourceStack> debug = Commands.literal("debug").requires(src -> src.hasPermission(2));
+        LiteralArgumentBuilder<CommandSourceStack> debug = Commands.literal("debug").requires(src -> MusicService.isGameMaster(src));
         for (Platform platform : Platform.values()) {
             debug.then(Commands.literal(platform.id())
                     .then(Commands.argument("keyword", StringArgumentType.greedyString())
@@ -31,7 +31,7 @@ public final class MuseCommands {
                     ctx.getSource().sendSuccess(() -> Component.literal("[点歌] " + line), false);
                 })))
                 .then(Commands.literal("skip").executes(ctx -> run(ctx, s -> s.skip(ctx.getSource()))))
-                .then(Commands.literal("clear").requires(src -> src.hasPermission(2))
+                .then(Commands.literal("clear").requires(src -> MusicService.isGameMaster(src))
                         .executes(ctx -> run(ctx, s -> s.clear(ctx.getSource()))))
                 .then(debug));
         // Short alias

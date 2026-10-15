@@ -20,4 +20,11 @@ stonecutter parameters {
     constants {
         match(loader, "fabric", "neoforge")
     }
+
+    // Renames in Mojang's names, applied to every file
+    replacements {
+        string(current.parsed >= "1.21.11") {
+            replace("ResourceLocation", "Identifier")
+        }
+    }
 }

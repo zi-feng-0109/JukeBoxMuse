@@ -19,7 +19,11 @@ public final class JukeboxMuseNeoForgeClient {
     public JukeboxMuseNeoForgeClient(IEventBus modEventBus) {
         // Client setup runs after every @Mod constructor, so the common entry point has installed the services
         modEventBus.addListener((FMLClientSetupEvent e) -> ClientHooks.init());
-        modEventBus.addListener((RegisterKeyMappingsEvent e) -> e.register(ClientHooks.OPEN_KEY));
+        modEventBus.addListener((RegisterKeyMappingsEvent e) -> {
+            //? if >=1.21.9
+            e.registerCategory(ClientHooks.CATEGORY);
+            e.register(ClientHooks.OPEN_KEY);
+        });
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> ClientHooks.tick());
         NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Post e) -> ClientHooks.renderHud(e.getGuiGraphics()));
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientHooks.disconnect());

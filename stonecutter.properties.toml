@@ -36,3 +36,68 @@ deps.fabric_api = "0.116.17+1.21.1"
 [neoforge."1.21.1"]
 mod.mc_compat = "[1.21.1]"
 deps.neoforge = "21.1.256"
+
+
+["1.21.4"]
+mod.mc_releases = ["1.21.4"]
+deps.parchment = "2025.03.23"
+
+[fabric."1.21.4"]
+mod.mc_compat = "1.21.4"
+deps.fabric_api = "0.119.4+1.21.4"
+
+[neoforge."1.21.4"]
+mod.mc_compat = "[1.21.4]"
+deps.neoforge = "21.4.161"
+
+
+["1.21.5"]
+mod.mc_releases = ["1.21.5"]
+deps.parchment = "2025.06.15"
+
+[fabric."1.21.5"]
+mod.mc_compat = "1.21.5"
+deps.fabric_api = "0.128.2+1.21.5"
+
+[neoforge."1.21.5"]
+mod.mc_compat = "[1.21.5]"
+deps.neoforge = "21.5.101"
+
+
+["1.21.8"]
+mod.mc_releases = ["1.21.8"]
+deps.parchment = "2025.09.14"
+
+[fabric."1.21.8"]
+mod.mc_compat = "1.21.8"
+deps.fabric_api = "0.136.1+1.21.8"
+
+[neoforge."1.21.8"]
+mod.mc_compat = "[1.21.8]"
+deps.neoforge = "21.8.57"
+
+
+["1.21.10"]
+mod.mc_releases = ["1.21.10"]
+deps.parchment = "2025.10.12"
+
+[fabric."1.21.10"]
+mod.mc_compat = "1.21.10"
+deps.fabric_api = "0.138.4+1.21.10"
+
+[neoforge."1.21.10"]
+mod.mc_compat = "[1.21.10]"
+deps.neoforge = "21.10.64"
+
+
+["1.21.11"]
+mod.mc_releases = ["1.21.11"]
+deps.parchment = "2025.12.20"
+
+[fabric."1.21.11"]
+mod.mc_compat = "1.21.11"
+deps.fabric_api = "0.141.6+1.21.11"
+
+[neoforge."1.21.11"]
+mod.mc_compat = "[1.21.11]"
+deps.neoforge = "21.11.48"
