@@ -11,6 +11,9 @@ public final class JukeboxMuseNeoForge {
     public JukeboxMuseNeoForge(IEventBus modEventBus) {
         JukeboxMuse.init(new NeoForgeServices());
         modEventBus.addListener(NeoForgeNetwork::register);
+        //? if <1.20.5 {
+        /^if (net.neoforged.fml.loading.FMLEnvironment.dist.isClient()) new JukeboxMuseNeoForgeClient(modEventBus);
+        ^///?}
     }
 }
 *///?}

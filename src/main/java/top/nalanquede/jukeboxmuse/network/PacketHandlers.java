@@ -15,18 +15,16 @@ public final class PacketHandlers {
     private PacketHandlers() {
     }
 
-    public static void handle(Object payload, ServerPlayer player) {
+    public static void handle(Payload payload, ServerPlayer player) {
         MusicService s = MusicService.get();
         if (s == null || player == null) return;
-        switch (payload) {
-            case HelloC2S p -> s.sendState(player);
-            case SearchC2S p -> s.search(player, p.platform(), p.keyword(), p.page());
-            case RequestSongC2S p -> s.request(player, p.song());
-            case SkipC2S p -> s.skip(player.createCommandSourceStack());
-            case RemoveC2S p -> s.remove(player, p.index());
-            case LoginStartC2S p -> s.loginStart(player, p.method());
-            case LogoutC2S p -> s.logout(player, p.platform());
-            default -> throw new IllegalArgumentException("Not a client→server payload: " + payload);
-        }
+        if (payload instanceof HelloC2S) s.sendState(player);
+        else if (payload instanceof SearchC2S p) s.search(player, p.platform(), p.keyword(), p.page());
+        else if (payload instanceof RequestSongC2S p) s.request(player, p.song());
+        else if (payload instanceof SkipC2S) s.skip(player.createCommandSourceStack());
+        else if (payload instanceof RemoveC2S p) s.remove(player, p.index());
+        else if (payload instanceof LoginStartC2S p) s.loginStart(player, p.method());
+        else if (payload instanceof LogoutC2S p) s.logout(player, p.platform());
+        else throw new IllegalArgumentException("Not a client→server payload: " + payload);
     }
 }

@@ -32,7 +32,7 @@ kill_game() {
 # Lines worth a look: errors and exceptions, minus the dev environment's usual noise
 problems() {
     grep -E 'ERROR|Exception|lost connection|Disconnected|Kicked' "$1" \
-        | grep -v -E 'Realms|SignedJWT|Anisotropic|server\.properties|NoSuchFileException: server|Failed to load eula|Failed to verify authentication|Narrator|YggdrasilUserApiService|Failed to fetch user properties|Server closed|lost connection: Disconnected|profile key pair|MinecraftClientHttpException: Status: 401' \
+        | grep -v -E 'Realms|SignedJWT|Anisotropic|server\.properties|NoSuchFileException: server|Failed to load eula|Failed to verify authentication|Narrator|YggdrasilUserApiService|Failed to fetch user properties|Server closed|lost connection: Disconnected|profile key pair|MinecraftClientHttpException: Status: 401|Error parsing option value|sessionserver.mojang.com|SocketTimeoutException|Couldn.t look up profile' \
         | head -20
 }
 

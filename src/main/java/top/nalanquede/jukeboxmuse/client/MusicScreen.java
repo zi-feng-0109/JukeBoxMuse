@@ -20,6 +20,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.common.LoginMethod;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
@@ -61,11 +62,11 @@ public class MusicScreen extends Screen {
     private static final int QUEUE_ROWS = 7;
     private static final int SCROLLBAR_W = 14;
     private static final int SCROLLER_H = 15;
-    private static final ResourceLocation SCROLLER = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller");
-    private static final ResourceLocation SCROLLER_DISABLED = ResourceLocation.withDefaultNamespace("container/creative_inventory/scroller_disabled");
-    private static final ResourceLocation XP_BACKGROUND = ResourceLocation.withDefaultNamespace("hud/experience_bar_background");
-    private static final ResourceLocation XP_PROGRESS = ResourceLocation.withDefaultNamespace("hud/experience_bar_progress");
-    private static final ResourceLocation MAP_BACKGROUND = ResourceLocation.withDefaultNamespace("textures/map/map_background.png");
+    private static final ResourceLocation SCROLLER = JukeboxMuse.vanillaId("container/creative_inventory/scroller");
+    private static final ResourceLocation SCROLLER_DISABLED = JukeboxMuse.vanillaId("container/creative_inventory/scroller_disabled");
+    private static final ResourceLocation XP_BACKGROUND = JukeboxMuse.vanillaId("hud/experience_bar_background");
+    private static final ResourceLocation XP_PROGRESS = JukeboxMuse.vanillaId("hud/experience_bar_progress");
+    private static final ResourceLocation MAP_BACKGROUND = JukeboxMuse.vanillaId("textures/map/map_background.png");
     private static final int XP_W = 182;
 
     // Now playing
@@ -547,7 +548,7 @@ public class MusicScreen extends Screen {
 
     private void renderTab(GuiGraphics g, int i, boolean selected) {
         String sprite = "container/creative_inventory/tab_top_" + (selected ? "selected_" : "unselected_") + (i + 1);
-        McGui.sprite(g, ResourceLocation.withDefaultNamespace(sprite), tabX(i), top - TAB_RISE, TAB_W, TAB_H);
+        McGui.sprite(g, JukeboxMuse.vanillaId(sprite), tabX(i), top - TAB_RISE, TAB_W, TAB_H);
     }
 
     private int tabX(int i) {

@@ -2,103 +2,94 @@ package top.nalanquede.jukeboxmuse.network;
 
 import java.util.List;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.common.LoginMethod;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
 import top.nalanquede.jukeboxmuse.common.Song;
 
-/** Every packet the mod sends. C2S = client to server, S2C = server to client. */
+/**
+ * Every packet the mod sends. C2S = client to server, S2C = server to client. These know nothing about Minecraft's
+ * packet classes, which differ between versions; {@link McPacket} and the loaders carry them.
+ */
 public final class MusePayloads {
     private MusePayloads() {
     }
 
-    private static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> typeOf(String name) {
-        return new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(JukeboxMuse.MODID, name));
+    /** A packet of the mod. */
+    public interface Payload {
+        PayloadType<?> type();
     }
 
     // ---------- client -> server ----------
 
     /** Sent when the music screen opens, so the server replies with queue + account state. */
-    public record HelloC2S() implements CustomPacketPayload {
+    public record HelloC2S() implements Payload {
         public static final HelloC2S INSTANCE = new HelloC2S();
-        public static final Type<HelloC2S> TYPE = typeOf("hello");
-        public static final StreamCodec<ByteBuf, HelloC2S> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+        public static final PayloadType<HelloC2S> TYPE = new PayloadType<>("hello", MuseCodec.unit(INSTANCE));
 
         @Override
-        public Type<HelloC2S> type() {
+        public PayloadType<HelloC2S> type() {
             return TYPE;
         }
     }
 
-    public record SearchC2S(Platform platform, String keyword, int page) implements CustomPacketPayload {
-        public static final Type<SearchC2S> TYPE = typeOf("search");
-        public static final StreamCodec<ByteBuf, SearchC2S> STREAM_CODEC = StreamCodec.composite(
-                MuseCodecs.PLATFORM, SearchC2S::platform,
-                ByteBufCodecs.stringUtf8(64), SearchC2S::keyword,
-                ByteBufCodecs.VAR_INT, SearchC2S::page,
-                SearchC2S::new);
+    public record SearchC2S(Platform platform, String keyword, int page) implements Payload {
+        public static final PayloadType<SearchC2S> TYPE = new PayloadType<>("search", MuseCodec.of((buf, p) -> {
+            MuseCodecs.PLATFORM.encode(buf, p.platform());
+            MuseCodecs.KEYWORD.encode(buf, p.keyword());
+            MuseCodec.VAR_INT.encode(buf, p.page());
+        }, buf -> new SearchC2S(MuseCodecs.PLATFORM.decode(buf), MuseCodecs.KEYWORD.decode(buf), MuseCodec.VAR_INT.decode(buf))));
 
         @Override
-        public Type<SearchC2S> type() {
+        public PayloadType<SearchC2S> type() {
             return TYPE;
         }
     }
 
-    public record RequestSongC2S(Song song) implements CustomPacketPayload {
-        public static final Type<RequestSongC2S> TYPE = typeOf("request_song");
-        public static final StreamCodec<ByteBuf, RequestSongC2S> STREAM_CODEC = MuseCodecs.SONG.map(RequestSongC2S::new, RequestSongC2S::song);
+    public record RequestSongC2S(Song song) implements Payload {
+        public static final PayloadType<RequestSongC2S> TYPE = new PayloadType<>("request_song", MuseCodecs.SONG.map(RequestSongC2S::new, RequestSongC2S::song));
 
         @Override
-        public Type<RequestSongC2S> type() {
+        public PayloadType<RequestSongC2S> type() {
             return TYPE;
         }
     }
 
-    public record SkipC2S() implements CustomPacketPayload {
+    public record SkipC2S() implements Payload {
         public static final SkipC2S INSTANCE = new SkipC2S();
-        public static final Type<SkipC2S> TYPE = typeOf("skip");
-        public static final StreamCodec<ByteBuf, SkipC2S> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+        public static final PayloadType<SkipC2S> TYPE = new PayloadType<>("skip", MuseCodec.unit(INSTANCE));
 
         @Override
-        public Type<SkipC2S> type() {
+        public PayloadType<SkipC2S> type() {
             return TYPE;
         }
     }
 
     /** Remove the queue entry at index (0 = next song after the current one). */
-    public record RemoveC2S(int index) implements CustomPacketPayload {
-        public static final Type<RemoveC2S> TYPE = typeOf("remove");
-        public static final StreamCodec<ByteBuf, RemoveC2S> STREAM_CODEC = ByteBufCodecs.VAR_INT.map(RemoveC2S::new, RemoveC2S::index);
+    public record RemoveC2S(int index) implements Payload {
+        public static final PayloadType<RemoveC2S> TYPE = new PayloadType<>("remove", MuseCodec.VAR_INT.map(RemoveC2S::new, RemoveC2S::index));
 
         @Override
-        public Type<RemoveC2S> type() {
+        public PayloadType<RemoveC2S> type() {
             return TYPE;
         }
     }
 
     /** Start (or re-show) a QR login from the account page. */
-    public record LoginStartC2S(LoginMethod method) implements CustomPacketPayload {
-        public static final Type<LoginStartC2S> TYPE = typeOf("login_start");
-        public static final StreamCodec<ByteBuf, LoginStartC2S> STREAM_CODEC = MuseCodecs.LOGIN_METHOD.map(LoginStartC2S::new, LoginStartC2S::method);
+    public record LoginStartC2S(LoginMethod method) implements Payload {
+        public static final PayloadType<LoginStartC2S> TYPE = new PayloadType<>("login_start", MuseCodecs.LOGIN_METHOD.map(LoginStartC2S::new, LoginStartC2S::method));
 
         @Override
-        public Type<LoginStartC2S> type() {
+        public PayloadType<LoginStartC2S> type() {
             return TYPE;
         }
     }
 
-    public record LogoutC2S(Platform platform) implements CustomPacketPayload {
-        public static final Type<LogoutC2S> TYPE = typeOf("logout");
-        public static final StreamCodec<ByteBuf, LogoutC2S> STREAM_CODEC = MuseCodecs.PLATFORM.map(LogoutC2S::new, LogoutC2S::platform);
+    public record LogoutC2S(Platform platform) implements Payload {
+        public static final PayloadType<LogoutC2S> TYPE = new PayloadType<>("logout", MuseCodecs.PLATFORM.map(LogoutC2S::new, LogoutC2S::platform));
 
         @Override
-        public Type<LogoutC2S> type() {
+        public PayloadType<LogoutC2S> type() {
             return TYPE;
         }
     }
@@ -106,57 +97,56 @@ public final class MusePayloads {
     // ---------- server -> client ----------
 
     /** error is empty on success. */
-    public record SearchResultS2C(Platform platform, String keyword, int page, List<Song> songs, String error) implements CustomPacketPayload {
-        public static final Type<SearchResultS2C> TYPE = typeOf("search_result");
-        public static final StreamCodec<ByteBuf, SearchResultS2C> STREAM_CODEC = StreamCodec.composite(
-                MuseCodecs.PLATFORM, SearchResultS2C::platform,
-                ByteBufCodecs.STRING_UTF8, SearchResultS2C::keyword,
-                ByteBufCodecs.VAR_INT, SearchResultS2C::page,
-                MuseCodecs.SONG.apply(ByteBufCodecs.list()), SearchResultS2C::songs,
-                ByteBufCodecs.STRING_UTF8, SearchResultS2C::error,
-                SearchResultS2C::new);
+    public record SearchResultS2C(Platform platform, String keyword, int page, List<Song> songs, String error) implements Payload {
+        private static final MuseCodec<List<Song>> SONGS = MuseCodecs.SONG.list();
+        public static final PayloadType<SearchResultS2C> TYPE = new PayloadType<>("search_result", MuseCodec.of((buf, p) -> {
+            MuseCodecs.PLATFORM.encode(buf, p.platform());
+            MuseCodec.STRING.encode(buf, p.keyword());
+            MuseCodec.VAR_INT.encode(buf, p.page());
+            SONGS.encode(buf, p.songs());
+            MuseCodec.STRING.encode(buf, p.error());
+        }, buf -> new SearchResultS2C(MuseCodecs.PLATFORM.decode(buf), MuseCodec.STRING.decode(buf), MuseCodec.VAR_INT.decode(buf),
+                SONGS.decode(buf), MuseCodec.STRING.decode(buf))));
 
         @Override
-        public Type<SearchResultS2C> type() {
+        public PayloadType<SearchResultS2C> type() {
             return TYPE;
         }
     }
 
     /** Upcoming songs, excluding the one currently playing. */
-    public record QueueS2C(List<QueueEntry> queue) implements CustomPacketPayload {
-        public static final Type<QueueS2C> TYPE = typeOf("queue");
-        public static final StreamCodec<ByteBuf, QueueS2C> STREAM_CODEC = MuseCodecs.QUEUE_ENTRY.apply(ByteBufCodecs.list()).map(QueueS2C::new, QueueS2C::queue);
+    public record QueueS2C(List<QueueEntry> queue) implements Payload {
+        public static final PayloadType<QueueS2C> TYPE = new PayloadType<>("queue", MuseCodecs.QUEUE_ENTRY.list().map(QueueS2C::new, QueueS2C::queue));
 
         @Override
-        public Type<QueueS2C> type() {
+        public PayloadType<QueueS2C> type() {
             return TYPE;
         }
     }
 
     /** Start playing entry from elapsedMs (non-zero for players who join mid-song). translation is an LRC too, "" if none. */
-    public record PlayS2C(QueueEntry entry, String url, long elapsedMs, String lyric, String translation) implements CustomPacketPayload {
-        public static final Type<PlayS2C> TYPE = typeOf("play");
-        public static final StreamCodec<ByteBuf, PlayS2C> STREAM_CODEC = StreamCodec.composite(
-                MuseCodecs.QUEUE_ENTRY, PlayS2C::entry,
-                ByteBufCodecs.STRING_UTF8, PlayS2C::url,
-                ByteBufCodecs.VAR_LONG, PlayS2C::elapsedMs,
-                ByteBufCodecs.STRING_UTF8, PlayS2C::lyric,
-                ByteBufCodecs.STRING_UTF8, PlayS2C::translation,
-                PlayS2C::new);
+    public record PlayS2C(QueueEntry entry, String url, long elapsedMs, String lyric, String translation) implements Payload {
+        public static final PayloadType<PlayS2C> TYPE = new PayloadType<>("play", MuseCodec.of((buf, p) -> {
+            MuseCodecs.QUEUE_ENTRY.encode(buf, p.entry());
+            MuseCodec.STRING.encode(buf, p.url());
+            MuseCodec.VAR_LONG.encode(buf, p.elapsedMs());
+            MuseCodec.STRING.encode(buf, p.lyric());
+            MuseCodec.STRING.encode(buf, p.translation());
+        }, buf -> new PlayS2C(MuseCodecs.QUEUE_ENTRY.decode(buf), MuseCodec.STRING.decode(buf), MuseCodec.VAR_LONG.decode(buf),
+                MuseCodec.STRING.decode(buf), MuseCodec.STRING.decode(buf))));
 
         @Override
-        public Type<PlayS2C> type() {
+        public PayloadType<PlayS2C> type() {
             return TYPE;
         }
     }
 
-    public record StopS2C() implements CustomPacketPayload {
+    public record StopS2C() implements Payload {
         public static final StopS2C INSTANCE = new StopS2C();
-        public static final Type<StopS2C> TYPE = typeOf("stop");
-        public static final StreamCodec<ByteBuf, StopS2C> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+        public static final PayloadType<StopS2C> TYPE = new PayloadType<>("stop", MuseCodec.unit(INSTANCE));
 
         @Override
-        public Type<StopS2C> type() {
+        public PayloadType<StopS2C> type() {
             return TYPE;
         }
     }
@@ -166,27 +156,34 @@ public final class MusePayloads {
      * human-readable status line. Both are only sent to players who may manage the accounts.
      */
     public record AccountInfo(Platform platform, boolean loggedIn, String nickname, boolean vip, String qrContent, String loginState) {
-        public static final StreamCodec<ByteBuf, AccountInfo> STREAM_CODEC = StreamCodec.composite(
-                MuseCodecs.PLATFORM, AccountInfo::platform,
-                ByteBufCodecs.BOOL, AccountInfo::loggedIn,
-                ByteBufCodecs.STRING_UTF8, AccountInfo::nickname,
-                ByteBufCodecs.BOOL, AccountInfo::vip,
-                ByteBufCodecs.STRING_UTF8, AccountInfo::qrContent,
-                ByteBufCodecs.STRING_UTF8, AccountInfo::loginState,
-                AccountInfo::new);
+        public static final MuseCodec<AccountInfo> CODEC = MuseCodec.of((buf, a) -> {
+            MuseCodecs.PLATFORM.encode(buf, a.platform());
+            MuseCodec.BOOL.encode(buf, a.loggedIn());
+            MuseCodec.STRING.encode(buf, a.nickname());
+            MuseCodec.BOOL.encode(buf, a.vip());
+            MuseCodec.STRING.encode(buf, a.qrContent());
+            MuseCodec.STRING.encode(buf, a.loginState());
+        }, buf -> new AccountInfo(MuseCodecs.PLATFORM.decode(buf), MuseCodec.BOOL.decode(buf), MuseCodec.STRING.decode(buf),
+                MuseCodec.BOOL.decode(buf), MuseCodec.STRING.decode(buf), MuseCodec.STRING.decode(buf)));
     }
 
     /** Every platform's account; canManage tells the client to show the account page. */
-    public record AccountS2C(boolean canManage, List<AccountInfo> accounts) implements CustomPacketPayload {
-        public static final Type<AccountS2C> TYPE = typeOf("account");
-        public static final StreamCodec<ByteBuf, AccountS2C> STREAM_CODEC = StreamCodec.composite(
-                ByteBufCodecs.BOOL, AccountS2C::canManage,
-                AccountInfo.STREAM_CODEC.apply(ByteBufCodecs.list()), AccountS2C::accounts,
-                AccountS2C::new);
+    public record AccountS2C(boolean canManage, List<AccountInfo> accounts) implements Payload {
+        private static final MuseCodec<List<AccountInfo>> ACCOUNTS = AccountInfo.CODEC.list();
+        public static final PayloadType<AccountS2C> TYPE = new PayloadType<>("account", MuseCodec.of((buf, p) -> {
+            MuseCodec.BOOL.encode(buf, p.canManage());
+            ACCOUNTS.encode(buf, p.accounts());
+        }, buf -> new AccountS2C(MuseCodec.BOOL.decode(buf), ACCOUNTS.decode(buf))));
 
         @Override
-        public Type<AccountS2C> type() {
+        public PayloadType<AccountS2C> type() {
             return TYPE;
         }
     }
+
+    /** In registration order. Loaders register every type here; handlers are in PacketHandlers and ClientHandlers. */
+    public static final List<PayloadType<?>> TO_SERVER = List.of(
+            HelloC2S.TYPE, SearchC2S.TYPE, RequestSongC2S.TYPE, SkipC2S.TYPE, RemoveC2S.TYPE, LoginStartC2S.TYPE, LogoutC2S.TYPE);
+    public static final List<PayloadType<?>> TO_CLIENT = List.of(
+            SearchResultS2C.TYPE, QueueS2C.TYPE, PlayS2C.TYPE, StopS2C.TYPE, AccountS2C.TYPE);
 }

@@ -114,7 +114,7 @@ public final class CoverArt {
             image.setPixelRGBA(i % VinylImage.SIZE, i / VinylImage.SIZE, abgr);
             //?}
         }
-        ResourceLocation id = ResourceLocation.fromNamespaceAndPath(JukeboxMuse.MODID, "cover/" + nextId++);
+        ResourceLocation id = JukeboxMuse.id("cover/" + nextId++);
         // Smooth (linear) scaling, without mipmaps
         //? if >=1.21.11 {
         /*DynamicTexture texture = new DynamicTexture(id::toString, image) {

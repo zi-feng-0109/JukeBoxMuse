@@ -2,8 +2,8 @@ package top.nalanquede.jukeboxmuse.platform;
 
 import java.nio.file.Path;
 
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
+import top.nalanquede.jukeboxmuse.network.MusePayloads.Payload;
 
 /**
  * What shared code needs from the mod loader. Each loader's entry point installs its implementation with
@@ -13,11 +13,16 @@ public interface LoaderServices {
     /** The game's config directory (config/). */
     Path configDir();
 
-    void sendToServer(CustomPacketPayload payload);
+    void sendToServer(Payload payload);
 
-    void sendToPlayer(ServerPlayer player, CustomPacketPayload payload);
+    /** Does nothing for a player without the mod (vanilla clients may join a Fabric server). */
+    void sendToPlayer(ServerPlayer player, Payload payload);
 
-    void sendToAllPlayers(CustomPacketPayload payload);
+    default void sendToAllPlayers(Payload payload) {
+        net.minecraft.server.MinecraftServer server = top.nalanquede.jukeboxmuse.server.MusicService.server();
+        if (server == null) return;
+        for (ServerPlayer player : server.getPlayerList().getPlayers()) sendToPlayer(player, payload);
+    }
 
     static LoaderServices get() {
         LoaderServices s = Holder.instance;

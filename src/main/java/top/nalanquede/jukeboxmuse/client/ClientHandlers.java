@@ -14,6 +14,16 @@ public final class ClientHandlers {
     private ClientHandlers() {
     }
 
+    /** A server→client payload. */
+    public static void handle(Payload payload) {
+        if (payload instanceof SearchResultS2C p) onSearchResult(p);
+        else if (payload instanceof QueueS2C p) onQueue(p);
+        else if (payload instanceof PlayS2C p) onPlay(p);
+        else if (payload instanceof StopS2C) onStop();
+        else if (payload instanceof AccountS2C p) onAccount(p);
+        else throw new IllegalArgumentException("Not a server→client payload: " + payload);
+    }
+
     public static void onSearchResult(SearchResultS2C p) {
         ClientState.searchPlatform = p.platform();
         ClientState.searchKeyword = p.keyword();

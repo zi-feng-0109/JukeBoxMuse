@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.common.Platform;
 
 /** Vanilla container look drawn with fills, so it follows no texture size: panels, slot-style insets, text boxes. */
@@ -23,9 +24,9 @@ final class McGui {
 
     /** The vanilla button sprites (AbstractButton.SPRITES is private in vanilla; only NeoForge widens it). */
     static final WidgetSprites BUTTON = new WidgetSprites(
-            ResourceLocation.withDefaultNamespace("widget/button"),
-            ResourceLocation.withDefaultNamespace("widget/button_disabled"),
-            ResourceLocation.withDefaultNamespace("widget/button_highlighted"));
+            JukeboxMuse.vanillaId("widget/button"),
+            JukeboxMuse.vanillaId("widget/button_disabled"),
+            JukeboxMuse.vanillaId("widget/button_highlighted"));
 
     private static final int PANEL = 0xFFC6C6C6;
     private static final int HIGHLIGHT = 0xFFFFFFFF;

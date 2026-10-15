@@ -6,6 +6,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.ClientPlayerNetworkEvent;
+//? if >=1.20.5
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
@@ -13,7 +14,8 @@ import net.neoforged.neoforge.common.NeoForge;
 import top.nalanquede.jukeboxmuse.JukeboxMuse;
 import top.nalanquede.jukeboxmuse.client.ClientHooks;
 
-/^* NeoForge client entry point: forwards client events to {@link ClientHooks}. ^/
+/^* NeoForge client entry point: forwards client events to {@link ClientHooks}. Started by the common one before 20.5. ^/
+//? if >=1.20.5
 @Mod(value = JukeboxMuse.MODID, dist = Dist.CLIENT)
 public final class JukeboxMuseNeoForgeClient {
     public JukeboxMuseNeoForgeClient(IEventBus modEventBus) {
@@ -24,7 +26,13 @@ public final class JukeboxMuseNeoForgeClient {
             e.registerCategory(ClientHooks.CATEGORY);
             e.register(ClientHooks.OPEN_KEY);
         });
+        //? if >=1.20.5 {
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> ClientHooks.tick());
+        //?} else {
+        /^NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.TickEvent.ClientTickEvent e) -> {
+            if (e.phase == net.neoforged.neoforge.event.TickEvent.Phase.END) ClientHooks.tick();
+        });
+        ^///?}
         NeoForge.EVENT_BUS.addListener((RenderGuiEvent.Post e) -> ClientHooks.renderHud(e.getGuiGraphics()));
         NeoForge.EVENT_BUS.addListener((ClientPlayerNetworkEvent.LoggingOut e) -> ClientHooks.disconnect());
     }

@@ -18,7 +18,7 @@ import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 public final class ClientHooks {
     //? if >=1.21.9 {
     /*// The mod's section of the controls screen; registered by each loader
-    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(ResourceLocation.fromNamespaceAndPath(JukeboxMuse.MODID, "main"));
+    public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(JukeboxMuse.id("main"));
     *///?}
     /** Registered by each loader. */
     public static final KeyMapping OPEN_KEY = new KeyMapping("key.jukeboxmuse.open", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,

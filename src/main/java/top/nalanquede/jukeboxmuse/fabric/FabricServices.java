@@ -4,21 +4,17 @@ package top.nalanquede.jukeboxmuse.fabric;
 import java.nio.file.Path;
 import java.util.function.Consumer;
 
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
+import top.nalanquede.jukeboxmuse.network.MusePayloads.Payload;
 import top.nalanquede.jukeboxmuse.platform.LoaderServices;
 
 final class FabricServices implements LoaderServices {
     /** Set by the client entry point: ClientPlayNetworking only exists on the client. */
-    static volatile Consumer<CustomPacketPayload> clientSender = p -> {
+    static volatile Consumer<Payload> clientSender = p -> {
         throw new IllegalStateException("Not a client");
     };
-    /** The running server, for sending to every player. */
-    static volatile MinecraftServer server;
 
     @Override
     public Path configDir() {
@@ -26,23 +22,22 @@ final class FabricServices implements LoaderServices {
     }
 
     @Override
-    public void sendToServer(CustomPacketPayload payload) {
+    public void sendToServer(Payload payload) {
         clientSender.accept(payload);
     }
 
     @Override
-    public void sendToPlayer(ServerPlayer player, CustomPacketPayload payload) {
+    public void sendToPlayer(ServerPlayer player, Payload payload) {
         // Vanilla clients may join a Fabric server; they cannot receive the mod's packets
-        if (ServerPlayNetworking.canSend(player, payload.type())) ServerPlayNetworking.send(player, payload);
-    }
-
-    @Override
-    public void sendToAllPlayers(CustomPacketPayload payload) {
-        MinecraftServer s = server;
-        if (s == null) return;
-        for (ServerPlayer player : PlayerLookup.all(s)) {
-            sendToPlayer(player, payload);
+        //? if >=1.20.5 {
+        if (ServerPlayNetworking.canSend(player, payload.type().mcType())) {
+            ServerPlayNetworking.send(player, new top.nalanquede.jukeboxmuse.network.McPacket(payload));
         }
+        //?} else {
+        /*if (ServerPlayNetworking.canSend(player, payload.type().id())) {
+            ServerPlayNetworking.send(player, payload.type().id(), FabricNetwork.write(payload));
+        }
+        *///?}
     }
 }
 //?}

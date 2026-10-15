@@ -9,7 +9,8 @@ repositories {
     mavenCentral()
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+// The oldest Java of any supported Minecraft version (17 for 1.20.1–1.20.4): core is compiled into every jar
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 tasks.withType<JavaCompile>().configureEach {
     options.encoding = "UTF-8"

@@ -1,8 +1,5 @@
 package top.nalanquede.jukeboxmuse.network;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
 import top.nalanquede.jukeboxmuse.common.LoginMethod;
 import top.nalanquede.jukeboxmuse.common.Platform;
 import top.nalanquede.jukeboxmuse.common.QueueEntry;
@@ -14,34 +11,33 @@ public final class MuseCodecs {
     }
 
     /** By ordinal, so new platforms and login methods must only be appended. */
-    public static final StreamCodec<ByteBuf, Platform> PLATFORM = ByteBufCodecs.idMapper(i -> Platform.values()[i], Platform::ordinal);
-    public static final StreamCodec<ByteBuf, LoginMethod> LOGIN_METHOD = ByteBufCodecs.idMapper(i -> LoginMethod.values()[i], LoginMethod::ordinal);
+    public static final MuseCodec<Platform> PLATFORM = MuseCodec.ordinal(Platform.values());
+    public static final MuseCodec<LoginMethod> LOGIN_METHOD = MuseCodec.ordinal(LoginMethod.values());
+    /** Search keywords: what the search box allows. */
+    public static final MuseCodec<String> KEYWORD = MuseCodec.string(64);
 
-    public static final StreamCodec<ByteBuf, Song> SONG = StreamCodec.of(MuseCodecs::writeSong, MuseCodecs::readSong);
+    public static final MuseCodec<Song> SONG = MuseCodec.of(MuseCodecs::writeSong, buf -> new Song(
+            PLATFORM.decode(buf), MuseCodec.STRING.decode(buf), MuseCodec.STRING.decode(buf),
+            MuseCodec.LONG.decode(buf), MuseCodec.LONG.decode(buf),
+            MuseCodec.STRING.decode(buf), MuseCodec.STRING.decode(buf), MuseCodec.STRING.decode(buf),
+            MuseCodec.LONG.decode(buf), MuseCodec.BOOL.decode(buf), MuseCodec.STRING.decode(buf)));
 
-    public static final StreamCodec<ByteBuf, QueueEntry> QUEUE_ENTRY = StreamCodec.composite(
-            SONG, QueueEntry::song,
-            ByteBufCodecs.STRING_UTF8, QueueEntry::requester,
-            QueueEntry::new);
+    public static final MuseCodec<QueueEntry> QUEUE_ENTRY = MuseCodec.of((buf, e) -> {
+        SONG.encode(buf, e.song());
+        MuseCodec.STRING.encode(buf, e.requester());
+    }, buf -> new QueueEntry(SONG.decode(buf), MuseCodec.STRING.decode(buf)));
 
-    private static void writeSong(ByteBuf buf, Song s) {
+    private static void writeSong(io.netty.buffer.ByteBuf buf, Song s) {
         PLATFORM.encode(buf, s.platform());
-        ByteBufCodecs.STRING_UTF8.encode(buf, s.id());
-        ByteBufCodecs.STRING_UTF8.encode(buf, s.fileId());
-        buf.writeLong(s.albumId());
-        buf.writeLong(s.trackId());
-        ByteBufCodecs.STRING_UTF8.encode(buf, s.name());
-        ByteBufCodecs.STRING_UTF8.encode(buf, s.singer());
-        ByteBufCodecs.STRING_UTF8.encode(buf, s.album());
-        buf.writeLong(s.durationMs());
-        buf.writeBoolean(s.vip());
-        ByteBufCodecs.STRING_UTF8.encode(buf, s.coverUrl());
-    }
-
-    private static Song readSong(ByteBuf buf) {
-        return new Song(PLATFORM.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf),
-                buf.readLong(), buf.readLong(),
-                ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf), ByteBufCodecs.STRING_UTF8.decode(buf),
-                buf.readLong(), buf.readBoolean(), ByteBufCodecs.STRING_UTF8.decode(buf));
+        MuseCodec.STRING.encode(buf, s.id());
+        MuseCodec.STRING.encode(buf, s.fileId());
+        MuseCodec.LONG.encode(buf, s.albumId());
+        MuseCodec.LONG.encode(buf, s.trackId());
+        MuseCodec.STRING.encode(buf, s.name());
+        MuseCodec.STRING.encode(buf, s.singer());
+        MuseCodec.STRING.encode(buf, s.album());
+        MuseCodec.LONG.encode(buf, s.durationMs());
+        MuseCodec.BOOL.encode(buf, s.vip());
+        MuseCodec.STRING.encode(buf, s.coverUrl());
     }
 }

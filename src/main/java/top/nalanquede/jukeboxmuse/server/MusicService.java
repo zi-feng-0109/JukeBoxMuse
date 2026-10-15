@@ -113,6 +113,12 @@ public final class MusicService {
         return instance;
     }
 
+    /** The running server, or null. */
+    public static MinecraftServer server() {
+        MusicService s = instance;
+        return s == null ? null : s.server;
+    }
+
     public static void start(MinecraftServer server) {
         instance = new MusicService(server);
     }
@@ -540,7 +546,7 @@ public final class MusicService {
 
     // ---------- helpers ----------
 
-    private static void reply(ServerPlayer player, net.minecraft.network.protocol.common.custom.CustomPacketPayload payload) {
+    private static void reply(ServerPlayer player, top.nalanquede.jukeboxmuse.network.MusePayloads.Payload payload) {
         LoaderServices.get().sendToPlayer(player, payload);
     }
 

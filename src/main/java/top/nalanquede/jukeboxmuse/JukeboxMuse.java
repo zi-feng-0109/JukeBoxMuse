@@ -6,6 +6,8 @@ import org.slf4j.Logger;
 
 import com.mojang.logging.LogUtils;
 
+import net.minecraft.resources.ResourceLocation;
+
 import top.nalanquede.jukeboxmuse.config.ServerSettings;
 import top.nalanquede.jukeboxmuse.music.MusicLog;
 import top.nalanquede.jukeboxmuse.platform.LoaderServices;
@@ -21,6 +23,22 @@ public final class JukeboxMuse {
     public static void init(LoaderServices services) {
         LoaderServices.install(services);
         MusicLog.setDebug(() -> ServerSettings.current().debugLog());
+    }
+
+    /** jukeboxmuse:path */
+    public static ResourceLocation id(String path) {
+        //? if >=1.21 {
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+        //?} else
+        /*return new ResourceLocation(MODID, path);*/
+    }
+
+    /** minecraft:path */
+    public static ResourceLocation vanillaId(String path) {
+        //? if >=1.21 {
+        return ResourceLocation.withDefaultNamespace(path);
+        //?} else
+        /*return new ResourceLocation(path);*/
     }
 
     /** config/jukeboxmuse/, holding the settings and the logged-in accounts. */
