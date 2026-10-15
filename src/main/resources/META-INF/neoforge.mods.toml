@@ -1,0 +1,27 @@
+# Expanded by build.neoforge.gradle.kts, see https://docs.neoforged.net/docs/gettingstarted/modfiles#neoforgemodstoml
+modLoader="javafml"
+loaderVersion="[1,)"
+license="${mod_license}"
+
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+authors="${mod_authors}"
+description='''
+点歌姬 - In-game song requests from KuGou, NetEase Cloud Music and QQ Music. Must be installed on both server and client.
+'''
+
+[[dependencies.${mod_id}]]
+    modId="neoforge"
+    type="required"
+    versionRange="[${neoforge},)"
+    ordering="NONE"
+    side="BOTH"
+
+[[dependencies.${mod_id}]]
+    modId="minecraft"
+    type="required"
+    versionRange="${minecraft}"
+    ordering="NONE"
+    side="BOTH"

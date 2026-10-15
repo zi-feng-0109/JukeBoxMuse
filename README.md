@@ -68,21 +68,28 @@
 
 ## 构建
 
-需要 JDK 21。
+需要 JDK 25（Gradle 本身运行在它上面），以及各版本编译用的 JDK 17 / 21，Gradle 会自动查找本机安装的 JDK。
 
 ```
-./gradlew build
+./gradlew build        # 构建所有版本
+./gradlew collectJar   # 构建并把所有 jar 收集到 build/libs/<mod 版本>/
+./gradlew :1.21.1-fabric:build   # 只构建一个版本
 ```
 
-产物在 `neoforge/build/libs/` 和 `fabric/build/libs/`（Fabric 的 `-dev.jar` 是开发环境用的，不要分发）。
+单个版本的产物在 `versions/<MC 版本>-<加载器>/build/libs/`。
+
+多版本用 [Stonecutter](https://stonecutter.kikugie.dev/) 管理：所有版本共用 `src/` 里的同一份代码，版本差异写成 `//? if >=1.21.6 {` 这样的条件注释，加载器差异写成 `//? if fabric {` / `//? if neoforge {`。
+IDE 里 `src/` 同一时间只对应一个版本（`stonecutter.gradle.kts` 里的 `active`），用 Gradle 任务 `Set active project to ...` 切换；提交前运行 `Reset active project` 切回默认版本。
+每个版本用到的 MC、加载器、依赖版本写在 `stonecutter.properties.toml`，支持的版本列表在 `settings.gradle.kts`。
 
 项目结构：
 
 | 目录 | 内容 |
 |---|---|
-| `core/` | 与 Minecraft 无关的纯 Java 代码：三个平台的接口、歌词、设置 |
-| `common/` | 两个加载器共用的原版 MC 代码：界面、渲染、播放、网络、点歌服务 |
-| `neoforge/`、`fabric/` | 各加载器的入口和事件 |
+| `core/` | 与 Minecraft 无关的纯 Java 代码：三个平台的接口、歌词、设置。有自己的单元测试（`./gradlew :core:test`），源码会编进每个版本的 jar |
+| `src/` | 所有版本、所有加载器共用的 MC 代码：界面、渲染、播放、网络、点歌服务；`fabric/`、`neoforge/` 包是各加载器的入口和事件 |
+| `build.fabric.gradle.kts`、`build.neoforge.gradle.kts` | 每个 Fabric / NeoForge 版本节点的构建脚本 |
+| `versions/` | Stonecutter 为每个版本生成的子项目，只有构建产物 |
 
 ## 许可证
 
