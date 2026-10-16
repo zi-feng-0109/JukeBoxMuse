@@ -23,6 +23,8 @@ public final class JukeboxMuse {
     public static void init(LoaderServices services) {
         LoaderServices.install(services);
         MusicLog.setDebug(() -> ServerSettings.current().debugLog());
+        // scripts/smoke-test.sh checks both sides log this
+        LOGGER.info("Jukebox Muse loaded");
     }
 
     /** jukeboxmuse:path */

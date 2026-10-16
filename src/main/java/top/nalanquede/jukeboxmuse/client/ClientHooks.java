@@ -30,6 +30,7 @@ public final class ClientHooks {
     /** At client setup, once the loader services are installed. */
     public static void init() {
         ClientSettings.load(JukeboxMuse.configDir().resolve("client.json"));
+        JukeboxMuse.LOGGER.info("Jukebox Muse client ready");
     }
 
     /** After every client tick. */
@@ -42,6 +43,7 @@ public final class ClientHooks {
                 mc.setScreen(new MusicScreen());
             }
         }
+        ScreenshotTour.tick(mc);
     }
 
     /** After the HUD is drawn: the current lyric line (and its translation) at the top of the screen. */

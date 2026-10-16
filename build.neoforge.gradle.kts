@@ -21,6 +21,14 @@ repositories {
     mavenCentral()
 }
 
+// NeoForge 20.4's net.minecraftforge:unsafe asks for log4j 2.11.+; a dynamic version is looked up online again every
+// 24 hours, so builds fail whenever a repository is unreachable. Pin what it resolves to.
+configurations.configureEach {
+    resolutionStrategy.eachDependency {
+        if (requested.group == "org.apache.logging.log4j" && requested.version == "2.11.+") useVersion("2.11.2")
+    }
+}
+
 sourceSets.main {
     java.srcDir(rootProject.file("core/src/main/java"))
 }
@@ -43,6 +51,10 @@ neoForge {
             ideName = "NeoForge Client $minecraft"
             // -Pjukeboxmuse.join=<address>: the client joins that server on start (scripts/smoke-test.sh)
             providers.gradleProperty("jukeboxmuse.join").orNull?.let { programArguments.addAll("--quickPlayMultiplayer", it) }
+            // -Pjukeboxmuse.screenshots: the client screenshots the music screen once in game, then quits (ScreenshotTour)
+            if (providers.gradleProperty("jukeboxmuse.screenshots").isPresent) {
+                systemProperty("jukeboxmuse.screenshotTour", project.name)
+            }
         }
         register("server") {
             server()
@@ -93,7 +105,14 @@ tasks {
             "neoforge" to project.property("deps.neoforge"),
         )
         inputs.properties(props)
-        filesMatching("META-INF/neoforge.mods.toml") { expand(props) }
+        // NeoForge reads META-INF/mods.toml before 20.5. Decided here: the closure runs at execution time, where the
+        // configuration cache allows no project references (sc)
+        val legacyModsToml = sc.current.parsed < "1.20.5"
+        inputs.property("legacyModsToml", legacyModsToml)
+        filesMatching("META-INF/neoforge.mods.toml") {
+            expand(props)
+            if (legacyModsToml) name = "mods.toml"
+        }
         exclude("fabric.mod.json")
     }
 

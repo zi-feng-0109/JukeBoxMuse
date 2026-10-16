@@ -25,6 +25,14 @@ deps.fabric_loader = "0.19.5"
 
 
 
+["1.20.1"]
+mod.mc_releases = ["1.20", "1.20.1"]
+deps.parchment = "2023.09.03"
+
+[fabric."1.20.1"]
+mod.mc_compat = ">=1.20 <=1.20.1"
+deps.fabric_api = "0.92.12+1.20.1"
+
 ["1.20.4"]
 mod.mc_releases = ["1.20.3", "1.20.4"]
 deps.parchment = "2024.04.14"

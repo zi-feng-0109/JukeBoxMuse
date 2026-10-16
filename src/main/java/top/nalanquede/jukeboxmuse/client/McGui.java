@@ -5,6 +5,7 @@ import com.mojang.math.Axis;
 
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
+//? if >=1.20.2
 import net.minecraft.client.gui.components.WidgetSprites;
 //? if <1.21.6
 import net.minecraft.client.renderer.RenderType;
@@ -23,10 +24,55 @@ final class McGui {
     static final int LABEL_DIM = 0xFF707070;
 
     /** The vanilla button sprites (AbstractButton.SPRITES is private in vanilla; only NeoForge widens it). */
+    //? if >=1.20.2 {
     static final WidgetSprites BUTTON = new WidgetSprites(
             JukeboxMuse.vanillaId("widget/button"),
             JukeboxMuse.vanillaId("widget/button_disabled"),
             JukeboxMuse.vanillaId("widget/button_highlighted"));
+    //?} else
+    /*static final Sprites BUTTON = new Sprites("widget/button", "widget/button_disabled", "widget/button_highlighted");*/
+
+    //? if <1.20.2 {
+    /*/^* WidgetSprites before 1.20.2: the button's sprite for its state. ^/
+    record Sprites(String enabled, String disabled, String focused) {
+        ResourceLocation get(boolean active, boolean focused) {
+            return JukeboxMuse.vanillaId(!active ? disabled : focused ? this.focused : enabled);
+        }
+    }
+
+    // The regions of 1.20.1's textures standing in for the sprites below
+    private static final ResourceLocation WIDGETS = JukeboxMuse.vanillaId("textures/gui/widgets.png");
+    private static final ResourceLocation ICONS = JukeboxMuse.vanillaId("textures/gui/icons.png");
+    private static final ResourceLocation TABS = JukeboxMuse.vanillaId("textures/gui/container/creative_inventory/tabs.png");
+
+    /^* Draws a sprite name the mod uses from its old texture; false if it is not one of them. ^/
+    private static boolean legacySprite(GuiGraphics g, String name, int x, int y, int w, int h) {
+        RenderSystem.enableBlend();
+        switch (name) {
+            // 200×20 buttons, nine-sliced with 3 px borders like vanilla's (20 wide, 4 tall edges)
+            case "widget/button_disabled" -> g.blitNineSliced(WIDGETS, x, y, w, h, 20, 4, 200, 20, 0, 46);
+            case "widget/button" -> g.blitNineSliced(WIDGETS, x, y, w, h, 20, 4, 200, 20, 0, 66);
+            case "widget/button_highlighted" -> g.blitNineSliced(WIDGETS, x, y, w, h, 20, 4, 200, 20, 0, 86);
+            case "hud/experience_bar_background" -> g.blit(ICONS, x, y, 0, 64, w, h);
+            case "container/creative_inventory/scroller" -> g.blit(TABS, x, y, 232, 0, w, h);
+            case "container/creative_inventory/scroller_disabled" -> g.blit(TABS, x, y, 244, 0, w, h);
+            default -> {
+                // Creative tabs: tab_top_(un)selected_N, 26×32 at u = (N-1)·26, v = 0 (unselected) or 32
+                String prefix = "container/creative_inventory/tab_top_";
+                if (!name.startsWith(prefix)) {
+                    RenderSystem.disableBlend();
+                    return false;
+                }
+                String rest = name.substring(prefix.length());
+                boolean selected = rest.startsWith("selected_");
+                int n = Integer.parseInt(rest.substring(rest.lastIndexOf('_') + 1));
+                g.blit(TABS, x, y, (n - 1) * 26, selected ? 32 : 0, w, h);
+            }
+        }
+        RenderSystem.disableBlend();
+        return true;
+    }
+    *///?}
 
     private static final int PANEL = 0xFFC6C6C6;
     private static final int HIGHLIGHT = 0xFFFFFFFF;
@@ -57,8 +103,11 @@ final class McGui {
         /*g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, x, y, w, h);
         *///?} elif >=1.21.2 {
         /*g.blitSprite(RenderType::guiTextured, sprite, x, y, w, h);
-        *///?} else
+        *///?} elif >=1.20.2 {
         g.blitSprite(sprite, x, y, w, h);
+        //?} else {
+        /*if (!legacySprite(g, sprite.getPath(), x, y, w, h)) throw new IllegalArgumentException("No 1.20.1 texture for " + sprite);
+        *///?}
     }
 
     /** The w×h region at (u, v) of a spriteW×spriteH GUI sprite, unscaled at (x, y). */
@@ -67,8 +116,15 @@ final class McGui {
         /*g.blitSprite(RenderPipelines.GUI_TEXTURED, sprite, spriteW, spriteH, u, v, x, y, w, h);
         *///?} elif >=1.21.2 {
         /*g.blitSprite(RenderType::guiTextured, sprite, spriteW, spriteH, u, v, x, y, w, h);
-        *///?} else
+        *///?} elif >=1.20.2 {
         g.blitSprite(sprite, spriteW, spriteH, u, v, x, y, w, h);
+        //?} else {
+        /*// Only the experience bar's progress is drawn in part; it is the row under the background in icons.png
+        if (!sprite.getPath().equals("hud/experience_bar_progress")) throw new IllegalArgumentException("No 1.20.1 texture for " + sprite);
+        RenderSystem.enableBlend();
+        g.blit(ICONS, x, y, u, 69 + v, w, h);
+        RenderSystem.disableBlend();
+        *///?}
     }
 
     /** A whole texW×texH texture (not a sprite), scaled to w×h at (x, y), with transparency. */

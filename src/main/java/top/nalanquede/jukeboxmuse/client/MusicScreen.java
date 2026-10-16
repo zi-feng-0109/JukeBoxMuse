@@ -185,7 +185,7 @@ public class MusicScreen extends Screen {
         int fx = tx;
         PlayerInfo info = minecraft == null || minecraft.getConnection() == null ? null : minecraft.getConnection().getPlayerInfo(now.requester());
         if (info != null) {
-            PlayerFaceRenderer.draw(g, info.getSkin(), tx, top + 46, 8);
+            PlayerFaceRenderer.draw(g, /*? if >=1.20.2 {*/info.getSkin()/*?} else {*//*info.getSkinLocation()*//*?}*/, tx, top + 46, 8);
             fx += 11;
         }
         McGui.label(g, font, font.plainSubstrByWidth(now.requester() + " 点播 · " + s.platform().displayName(), tw - (fx - tx)), fx, top + 46, McGui.LABEL);
@@ -373,7 +373,7 @@ public class MusicScreen extends Screen {
             int nameX = nameRight - font.width(requester);
             g.drawString(font, requester, nameX, y + 6, 0xFFE0E0E0);
             PlayerInfo info = minecraft.getConnection() == null ? null : minecraft.getConnection().getPlayerInfo(e.requester());
-            if (info != null) PlayerFaceRenderer.draw(g, info.getSkin(), nameX - 11, y + 6, 8);
+            if (info != null) PlayerFaceRenderer.draw(g, /*? if >=1.20.2 {*/info.getSkin()/*?} else {*//*info.getSkinLocation()*//*?}*/, nameX - 11, y + 6, 8);
 
             // Your own songs in gold, like a rare item name
             int titleX = rowX + 22;
@@ -521,9 +521,15 @@ public class MusicScreen extends Screen {
         }
     }
 
+    // Before 1.20.2, render() draws the background itself (see render) and renderBackground has no mouse arguments
+    //? if >=1.20.2 {
     @Override
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(g, mouseX, mouseY, partialTick);
+    //?} else {
+    /*private void renderPanel(GuiGraphics g, int mouseX, int mouseY) {
+        renderBackground(g);
+    *///?}
         // Like the creative inventory: unselected tabs behind the panel, the selected one in front of it
         Tab[] tabs = tabs();
         for (int i = 0; i < tabs.length; i++) {
@@ -564,6 +570,8 @@ public class MusicScreen extends Screen {
 
     @Override
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        //? if <1.20.2
+        /*renderPanel(g, mouseX, mouseY);*/
         super.render(g, mouseX, mouseY, partialTick);
         switch (tab) {
             case NOW -> renderNow(g);
@@ -663,7 +671,10 @@ public class MusicScreen extends Screen {
     }
 
     @Override
+    //? if >=1.20.2 {
     public boolean mouseScrolled(double mouseX, double mouseY, double scrollX, double scrollY) {
+    //?} else
+    /*public boolean mouseScrolled(double mouseX, double mouseY, double scrollY) {*/
         int delta = scrollY > 0 ? -1 : scrollY < 0 ? 1 : 0;
         if (delta != 0 && tab == Tab.SEARCH) {
             setScroll(searchScroll + delta);
@@ -673,7 +684,7 @@ public class MusicScreen extends Screen {
             setScroll(queueScroll + delta);
             return true;
         }
-        return super.mouseScrolled(mouseX, mouseY, scrollX, scrollY);
+        return super.mouseScrolled(mouseX, mouseY, /*? if >=1.20.2 {*/scrollX, /*?}*/scrollY);
     }
 
     /** Enter to search, and the open-screen key to close; true when the key was used. */

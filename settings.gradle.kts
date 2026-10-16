@@ -29,6 +29,8 @@ stonecutter {
             for (loader in loaders) version("$version-$loader", version).buildscript("build.$loader.gradle.kts")
         }
 
+        // NeoForge only forked from Forge after 1.20.1
+        mc("1.20.1", "fabric")
         mc("1.20.4", "fabric", "neoforge")
         mc("1.20.6", "fabric", "neoforge")
         mc("1.21.1", "fabric", "neoforge")

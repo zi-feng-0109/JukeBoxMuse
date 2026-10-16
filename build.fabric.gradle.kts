@@ -76,6 +76,10 @@ loom {
     providers.gradleProperty("jukeboxmuse.join").orNull?.let { address ->
         runConfigs.named("client") { programArgs("--quickPlayMultiplayer", address) }
     }
+    // -Pjukeboxmuse.screenshots: the client screenshots the music screen once in game, then quits (ScreenshotTour)
+    if (providers.gradleProperty("jukeboxmuse.screenshots").isPresent) {
+        runConfigs.named("client") { vmArg("-Djukeboxmuse.screenshotTour=${project.name}") }
+    }
 }
 
 java {

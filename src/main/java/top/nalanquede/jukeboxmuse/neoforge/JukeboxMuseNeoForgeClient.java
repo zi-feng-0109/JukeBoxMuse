@@ -29,7 +29,8 @@ public final class JukeboxMuseNeoForgeClient {
         //? if >=1.20.5 {
         NeoForge.EVENT_BUS.addListener((ClientTickEvent.Post e) -> ClientHooks.tick());
         //?} else {
-        /^NeoForge.EVENT_BUS.addListener((net.neoforged.neoforge.event.TickEvent.ClientTickEvent e) -> {
+        /^// With the class given: 20.4's bus cannot tell a lambda's event type when the event is a nested class
+        NeoForge.EVENT_BUS.addListener(net.neoforged.neoforge.event.TickEvent.ClientTickEvent.class, e -> {
             if (e.phase == net.neoforged.neoforge.event.TickEvent.Phase.END) ClientHooks.tick();
         });
         ^///?}
