@@ -89,6 +89,38 @@ final class McGui {
     private McGui() {
     }
 
+    // The screen being shown, and the game's HUD state: on Minecraft itself before 26.2, on Minecraft.gui from then
+
+    static net.minecraft.client.gui.screens.Screen screen(net.minecraft.client.Minecraft mc) {
+        //? if >=26.2 {
+        /*return mc.gui.screen();
+        *///?} else
+        return mc.screen;
+    }
+
+    static void setScreen(net.minecraft.client.Minecraft mc, net.minecraft.client.gui.screens.Screen screen) {
+        //? if >=26.2 {
+        /*mc.gui.setScreen(screen);
+        *///?} else
+        mc.setScreen(screen);
+    }
+
+    /** F1 pressed. */
+    static boolean hudHidden(net.minecraft.client.Minecraft mc) {
+        //? if >=26.2 {
+        /*return mc.gui.hud.isHidden();
+        *///?} else
+        return mc.options.hideGui;
+    }
+
+    /** The rainbow "Now Playing" line a jukebox shows above the hotbar. */
+    static void setNowPlaying(net.minecraft.client.Minecraft mc, net.minecraft.network.chat.Component title) {
+        //? if >=26.2 {
+        /*mc.gui.hud.setNowPlaying(title);
+        *///?} else
+        mc.gui.setNowPlaying(title);
+    }
+
     static ItemStack disc(Platform platform) {
         return switch (platform) {
             case KUGOU -> KUGOU_DISC;

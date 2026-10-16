@@ -38,7 +38,7 @@ import top.nalanquede.jukeboxmuse.network.MusePayloads.AccountInfo;
  * Drives the music screen in a real client (./gradlew :<version>-fabric:runClientGameTest) and takes screenshots of
  * every page, for checking the rendering on each Minecraft version. Uses fake client state, so it needs no logged-in
  * account; covers come from a local HTTP server. Written against APIs that are the same on every supported version
- * (private screen members through reflection), so it has no Stonecutter conditions.
+ * (private screen members through reflection), so it has almost no Stonecutter conditions.
  */
 public final class MuseClientGameTest implements FabricClientGameTest {
     private static final int GLFW_MOUSE_BUTTON_LEFT = 0;
@@ -48,6 +48,11 @@ public final class MuseClientGameTest implements FabricClientGameTest {
         HttpServer covers = startCoverServer();
         String coverUrl = "http://127.0.0.1:" + covers.getAddress().getPort() + "/cover.png";
         try (TestSingleplayerContext world = context.worldBuilder().create()) {
+            //? if >=26.2 {
+            /*world.getConnection().waitForChunksRender();
+            *///?} elif >=26.1 {
+            /*world.getClientLevel().waitForChunksRender();
+            *///?} else
             world.getClientWorld().waitForChunksRender();
 
             checkKeyMapping(context);
@@ -92,7 +97,7 @@ public final class MuseClientGameTest implements FabricClientGameTest {
             // The open key closes the screen; not on the search page, where it types into the focused search box
             clickTab(context, 0);
             context.getInput().pressKey(ClientHooks.OPEN_KEY);
-            context.waitFor(mc -> mc.screen == null, 40);
+            context.waitFor(mc -> screen(mc) == null, 40);
 
             // The lyric line on the HUD
             context.waitTicks(5);
@@ -128,7 +133,7 @@ public final class MuseClientGameTest implements FabricClientGameTest {
             if (label.isEmpty() || label.startsWith("key.")) {
                 throw new AssertionError("Key category has no translation: " + key + " -> " + label);
             }
-            if (!I18n.exists(ClientHooks.OPEN_KEY.getName())) {
+            if (!net.minecraft.locale.Language.getInstance().has(ClientHooks.OPEN_KEY.getName())) {
                 throw new AssertionError("Open key has no translation: " + ClientHooks.OPEN_KEY.getName());
             }
         });
@@ -188,7 +193,7 @@ public final class MuseClientGameTest implements FabricClientGameTest {
     /** Moves the cursor onto the index-th tab, using the screen's own layout. */
     private static void hoverTab(ClientGameTestContext context, int index) {
         double[] pos = context.computeOnClient(mc -> {
-            MusicScreen screen = (MusicScreen) mc.screen;
+            MusicScreen screen = (MusicScreen) screen(mc);
             int x = (int) invoke(screen, "tabX", index) + 13;
             int y = (int) get(screen, "top") - 14;
             return new double[]{x, y};
@@ -199,7 +204,7 @@ public final class MuseClientGameTest implements FabricClientGameTest {
     /** Moves the cursor to a point of the panel, as fractions of its size. */
     private static void moveToPanel(ClientGameTestContext context, double fx, double fy) {
         double[] pos = context.computeOnClient(mc -> {
-            MusicScreen screen = (MusicScreen) mc.screen;
+            MusicScreen screen = (MusicScreen) screen(mc);
             int left = (int) get(screen, "left");
             int top = (int) get(screen, "top");
             return new double[]{left + 340 * fx, top + 210 * fy};
@@ -211,6 +216,13 @@ public final class MuseClientGameTest implements FabricClientGameTest {
         double scale = context.computeOnClient(mc -> mc.getWindow().getGuiScale());
         context.getInput().setCursorPos(x * scale, y * scale);
         context.waitTick();
+    }
+
+    private static net.minecraft.client.gui.screens.Screen screen(net.minecraft.client.Minecraft mc) {
+        //? if >=26.2 {
+        /*return mc.gui.screen();
+        *///?} else
+        return mc.screen;
     }
 
     private static Object invoke(Object target, String name, int arg) {

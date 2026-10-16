@@ -1,7 +1,5 @@
 package top.nalanquede.jukeboxmuse.client;
 
-import org.lwjgl.glfw.GLFW;
-
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.KeyMapping;
@@ -21,7 +19,7 @@ public final class ClientHooks {
     public static final KeyMapping.Category CATEGORY = new KeyMapping.Category(JukeboxMuse.id("main"));
     *///?}
     /** Registered by each loader. */
-    public static final KeyMapping OPEN_KEY = new KeyMapping("key.jukeboxmuse.open", InputConstants.Type.KEYSYM, GLFW.GLFW_KEY_K,
+    public static final KeyMapping OPEN_KEY = new KeyMapping("key.jukeboxmuse.open", /*? if >=26.3 {*//*InputConstants.Type.KEYBOARD*//*?} else {*/InputConstants.Type.KEYSYM/*?}*/, InputConstants.KEY_K,
             /*? if >=1.21.9 {*//*CATEGORY*//*?} else {*/"key.categories.jukeboxmuse"/*?}*/);
 
     private ClientHooks() {
@@ -37,10 +35,10 @@ public final class ClientHooks {
     public static void tick() {
         Minecraft mc = Minecraft.getInstance();
         while (OPEN_KEY.consumeClick()) {
-            if (mc.screen == null && mc.player != null) {
+            if (McGui.screen(mc) == null && mc.player != null) {
                 // Ask the server for fresh queue/account state, then open
                 LoaderServices.get().sendToServer(HelloC2S.INSTANCE);
-                mc.setScreen(new MusicScreen());
+                McGui.setScreen(mc, new MusicScreen());
             }
         }
         ScreenshotTour.tick(mc);
@@ -49,7 +47,7 @@ public final class ClientHooks {
     /** After the HUD is drawn: the current lyric line (and its translation) at the top of the screen. */
     public static void renderHud(GuiGraphics g) {
         Minecraft mc = Minecraft.getInstance();
-        if (!ClientSettings.get().lyricHud() || ClientState.nowPlaying == null || mc.options.hideGui || mc.screen instanceof MusicScreen) return;
+        if (!ClientSettings.get().lyricHud() || ClientState.nowPlaying == null || McGui.hudHidden(mc) || McGui.screen(mc) instanceof MusicScreen) return;
         Lyrics lyrics = ClientState.lyrics;
         int idx = lyrics.indexAt(ClientState.positionMs());
         if (idx < 0) return;

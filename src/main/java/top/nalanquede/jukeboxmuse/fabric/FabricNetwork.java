@@ -25,12 +25,12 @@ final class FabricNetwork {
     static void register() {
         //? if >=1.20.5 {
         for (PayloadType<?> type : MusePayloads.TO_SERVER) {
-            PayloadTypeRegistry.playC2S().register(type.mcType(), type.streamCodec());
+            PayloadTypeRegistry./*? if >=26.1 {*//*serverboundPlay*//*?} else {*/playC2S/*?}*/().register(type.mcType(), type.streamCodec());
             ServerPlayNetworking.registerGlobalReceiver(type.mcType(), (p, ctx) -> PacketHandlers.handle(p.payload(), ctx.player()));
         }
         // Their receivers are registered by the client entry point
         for (PayloadType<?> type : MusePayloads.TO_CLIENT) {
-            PayloadTypeRegistry.playS2C().register(type.mcType(), type.streamCodec());
+            PayloadTypeRegistry./*? if >=26.1 {*//*clientboundPlay*//*?} else {*/playS2C/*?}*/().register(type.mcType(), type.streamCodec());
         }
         //?} else {
         /*for (PayloadType<?> type : MusePayloads.TO_SERVER) {

@@ -33,7 +33,9 @@ final class IconButton extends AbstractButton {
     }
 
     @Override
-    //? if >=1.21.11 {
+    //? if >=26.1 {
+    /*protected void extractContents(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+    *///?} elif >=1.21.11 {
     /*protected void renderContents(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
     *///?} else
     protected void renderWidget(GuiGraphics g, int mouseX, int mouseY, float partialTick) {

@@ -43,9 +43,9 @@ final class ScreenshotTour {
             fill();
         } else if (step <= TABS.length) {
             setTab(TABS[step - 1]);
-            mc.setScreen(new MusicScreen());
+            McGui.setScreen(mc, new MusicScreen());
         } else if (step == TABS.length + 1) {
-            mc.setScreen(null);
+            McGui.setScreen(mc, null);
         } else {
             JukeboxMuse.LOGGER.info("Screenshot tour finished");
             mc.stop();
@@ -64,7 +64,7 @@ final class ScreenshotTour {
         if (ticks < 10 || step < 2 || shotAtStep == step) return;
         shotAtStep = step;
         String shot = step - 2 < TABS.length ? "tab-" + TABS[step - 2].toLowerCase() : "hud";
-        Screenshot.grab(new File(mc.gameDirectory.getPath()), "jukeboxmuse-" + NAME + "-" + shot + ".png", mc.getMainRenderTarget(),
+        Screenshot.grab(new File(mc.gameDirectory.getPath()), "jukeboxmuse-" + NAME + "-" + shot + ".png", /*? if >=26.2 {*//*mc.gameRenderer.mainRenderTarget()*//*?} else {*/mc.getMainRenderTarget()/*?}*/,
                 /*? if >=1.21.6 {*//*1, *//*?}*/
                 message -> JukeboxMuse.LOGGER.info("Screenshot tour: {}", message.getString()));
     }

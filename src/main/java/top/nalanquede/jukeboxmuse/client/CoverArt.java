@@ -119,7 +119,7 @@ public final class CoverArt {
         //? if >=1.21.11 {
         /*DynamicTexture texture = new DynamicTexture(id::toString, image) {
             {
-                sampler = com.mojang.blaze3d.systems.RenderSystem.getSamplerCache().getClampToEdge(com.mojang.blaze3d.textures.FilterMode.LINEAR);
+                sampler = com.mojang.blaze3d.systems.RenderSystem.getSamplerCache().getClampToEdge(LINEAR);
             }
         };
         *///?} elif >=1.21.5 {
@@ -132,6 +132,14 @@ public final class CoverArt {
         Minecraft.getInstance().getTextureManager().register(id, texture);
         entry.texture = id;
     }
+
+    //? if >=1.21.11 {
+    /*// 26.3 moved the GPU texture types from blaze3d to renderpearl
+    //? if >=26.3 {
+    /^private static final com.mojang.renderpearl.api.textures.FilterMode LINEAR = com.mojang.renderpearl.api.textures.FilterMode.LINEAR;
+    ^///?} else
+    private static final com.mojang.blaze3d.textures.FilterMode LINEAR = com.mojang.blaze3d.textures.FilterMode.LINEAR;
+    *///?}
 
     private static void evict() {
         Iterator<Entry> it = CACHE.values().iterator();

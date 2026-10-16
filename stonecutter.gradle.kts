@@ -27,5 +27,16 @@ stonecutter parameters {
         string(current.parsed >= "1.21.11") {
             replace("ResourceLocation", "Identifier")
         }
+        // 26.1 renamed the GUI drawing API ("extracting" render state) without changing its arguments. Only the
+        // mod's own spellings are listed, so its methods named render* stay as they are.
+        string(current.parsed >= "26.1") {
+            replace("GuiGraphics g", "GuiGraphicsExtractor g")
+            replace("import net.minecraft.client.gui.GuiGraphics;", "import net.minecraft.client.gui.GuiGraphicsExtractor;")
+            replace("g.drawCenteredString(", "g.centeredText(")
+            replace("g.drawString(", "g.text(")
+            replace("g.renderItem(", "g.item(")
+            replace("import net.minecraft.client.gui.components.PlayerFaceRenderer;", "import net.minecraft.client.gui.components.PlayerFaceExtractor;")
+            replace("PlayerFaceRenderer.draw(", "PlayerFaceExtractor.extractRenderState(")
+        }
     }
 }

@@ -47,8 +47,7 @@ public final class ClientHandlers {
         ClientState.startedAtMs = System.currentTimeMillis() - p.elapsedMs();
         if (!alreadyPlaying) {
             AudioPlayer.play(p.url(), p.elapsedMs());
-            // The rainbow "Now Playing" line a jukebox shows above the hotbar
-            Minecraft.getInstance().gui.setNowPlaying(Component.literal(p.entry().song().title()));
+            McGui.setNowPlaying(Minecraft.getInstance(), Component.literal(p.entry().song().title()));
             CoverArt.texture(p.entry().song().coverUrl());
         }
     }

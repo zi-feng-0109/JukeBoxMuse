@@ -3,7 +3,7 @@ package top.nalanquede.jukeboxmuse.client;
 import java.util.Arrays;
 import java.util.List;
 
-import org.lwjgl.glfw.GLFW;
+import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSliderButton;
@@ -522,7 +522,11 @@ public class MusicScreen extends Screen {
     }
 
     // Before 1.20.2, render() draws the background itself (see render) and renderBackground has no mouse arguments
-    //? if >=1.20.2 {
+    //? if >=26.1 {
+    /*@Override
+    public void extractBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.extractBackground(g, mouseX, mouseY, partialTick);
+    *///?} elif >=1.20.2 {
     @Override
     public void renderBackground(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         super.renderBackground(g, mouseX, mouseY, partialTick);
@@ -569,10 +573,15 @@ public class MusicScreen extends Screen {
     }
 
     @Override
+    //? if >=26.1 {
+    /*public void extractRenderState(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
+        super.extractRenderState(g, mouseX, mouseY, partialTick);
+    *///?} else {
     public void render(GuiGraphics g, int mouseX, int mouseY, float partialTick) {
         //? if <1.20.2
         /*renderPanel(g, mouseX, mouseY);*/
         super.render(g, mouseX, mouseY, partialTick);
+    //?}
         switch (tab) {
             case NOW -> renderNow(g);
             case SEARCH -> renderSearch(g);
@@ -690,12 +699,12 @@ public class MusicScreen extends Screen {
     /** Enter to search, and the open-screen key to close; true when the key was used. */
     private boolean pressed(int keyCode, boolean openKey) {
         boolean typing = tab == Tab.SEARCH && searchBox != null && searchBox.isFocused();
-        if (typing && (keyCode == GLFW.GLFW_KEY_ENTER || keyCode == GLFW.GLFW_KEY_KP_ENTER)) {
+        if (typing && (keyCode == InputConstants.KEY_RETURN || keyCode == InputConstants.KEY_NUMPADENTER)) {
             doSearch(1);
             return true;
         }
         // Don't let the open-screen key close the screen while typing
-        if (typing && keyCode != GLFW.GLFW_KEY_ESCAPE) return false;
+        if (typing && keyCode != InputConstants.KEY_ESCAPE) return false;
         if (openKey) {
             onClose();
             return true;
