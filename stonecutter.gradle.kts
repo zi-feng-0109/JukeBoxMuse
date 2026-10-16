@@ -1,8 +1,9 @@
 plugins {
     id("dev.kikugie.stonecutter")
-    // Fabric Loom, applied per node by loom-back-compat. 1.15.x until the Gradle wrapper is upgraded:
-    // 1.16 needs Gradle 9.4, 1.18+ (needed for 26.1's fabric-loom) runs Gradle on Java 25
-    id("net.fabricmc.fabric-loom-remap") version "1.15.5" apply false
+    // Fabric Loom, applied per node by loom-back-compat: fabric-loom-remap for obfuscated Minecraft (before 26.1),
+    // fabric-loom for 26.1+. 1.19 needs Gradle 9.8 running on Java 25 (gradle/gradle-daemon-jvm.properties).
+    id("net.fabricmc.fabric-loom-remap") version "1.19.1" apply false
+    id("net.fabricmc.fabric-loom") version "1.19.1" apply false
 }
 
 // The node the sources in src/ are currently written for. Change it with the "Set active project to ..." tasks.

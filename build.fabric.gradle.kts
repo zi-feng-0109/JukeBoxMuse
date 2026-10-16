@@ -66,7 +66,7 @@ loom {
         // Shared by every node; the game keeps config/jukeboxmuse/ (settings, logged-in accounts) here.
         // The game tests get a throwaway directory of their own (screenshots end up in its screenshots/).
         runDir = if (name == "clientGameTest") "build/run/clientGameTest" else "../../run/$environment"
-        appendProjectPathToConfigName = false
+        appendProjectPathToDisplayName = false
         configName = if (name == "clientGameTest") "Fabric Client Game Test $minecraft"
         else "Fabric ${environment.replaceFirstChar(Char::uppercase)} $minecraft"
     }
