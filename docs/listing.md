@@ -40,6 +40,7 @@ CurseForge 和 Modrinth 都要求正文是英文或带英文翻译，所以英�
 
 ### Installation
 
+Fabric and NeoForge, Minecraft 1.20.1 – 26.3 (1.20.1: Fabric only). Pick the file for your game version and loader.
 Required on **both server and client** (single player: client only). The Fabric version needs Fabric API.
 
 ### Usage
@@ -68,6 +69,7 @@ License: GPL-3.0-or-later · Source & issues: [GitHub](https://github.com/zi-fen
 
 ### 安装与使用
 
+- 支持 Fabric 和 NeoForge，Minecraft 1.20.1、1.20.3–1.20.4、1.20.5–1.20.6、1.21.1、1.21.4、1.21.5、1.21.8、1.21.10、1.21.11、26.1–26.1.2、26.2、26.3（1.20.1 只有 Fabric 版），下载时选对应游戏版本和加载器的文件
 - **服务端和客户端都必须安装**，且版本一致（单人游戏只需装在客户端）；Fabric 版需要 Fabric API
 - 按 **K** 打开点歌界面；管理员在「账号」页选择平台扫码登录（建议用小号）；在「搜索点歌」页搜歌，点一下即可加入队列
 - 指令：`/muse status`、`/muse skip`、`/muse clear`

@@ -3,7 +3,7 @@
 
 mod.id = "jukeboxmuse"
 mod.name = "Jukebox Muse"
-mod.version = "1.0.0"
+mod.version = "1.1.0"
 mod.group = "top.nalanquede.jukeboxmuse"
 mod.license = "GPL-3.0-or-later"
 mod.authors = "zifeng0109"
