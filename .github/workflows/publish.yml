@@ -1,6 +1,7 @@
-# Publishes a release when a version tag such as v1.0.0 is pushed:
-# uploads both loaders' jars to Modrinth / CurseForge (publishMods) and attaches them to a GitHub release.
-# Needs the MODRINTH_TOKEN and CURSEFORGE_TOKEN repository secrets, and the project ids in gradle.properties.
+# Publishes a release when a version tag such as v1.1.0 is pushed: builds every node (versions/<minecraft>-<loader>),
+# uploads the jars to CurseForge / Modrinth (publishMods) and attaches them to a GitHub release.
+# Needs the CURSEFORGE_TOKEN / MODRINTH_TOKEN repository secrets; a platform whose project id (publish.* in
+# stonecutter.properties.toml) is empty is skipped.
 name: Publish
 
 on:
@@ -17,31 +18,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # 17 and 21 compile the older Minecraft versions; Gradle itself runs on 25 (the last one, which becomes
+      # JAVA_HOME; see gradle/gradle-daemon-jvm.properties)
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 21
+          java-version: |
+            17
+            21
+            25
 
       - uses: gradle/actions/setup-gradle@v4
 
       - run: chmod +x gradlew
 
-      # The tag must match mod_version, or the uploaded files would carry a different version than the tag
-      - name: Check tag matches mod_version
+      # The tag must match mod.version, or the uploaded files would carry a different version than the tag
+      - name: Check tag matches mod.version
         run: |
-          version=$(grep '^mod_version=' gradle.properties | cut -d= -f2)
+          version=$(sed -n 's/^mod\.version = "\(.*\)"$/\1/p' stonecutter.properties.toml)
           if [ "v$version" != "$GITHUB_REF_NAME" ]; then
-            echo "Tag $GITHUB_REF_NAME does not match mod_version=$version"
+            echo "Tag $GITHUB_REF_NAME does not match mod.version=$version"
             exit 1
           fi
 
-      - run: ./gradlew build publishMods
+      # collectJar copies every node's distributable jar into build/libs/<mod version>/
+      - run: ./gradlew build collectJar publishMods
         env:
           MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
           CURSEFORGE_TOKEN: ${{ secrets.CURSEFORGE_TOKEN }}
 
       - uses: softprops/action-gh-release@v2
         with:
-          files: |
-            neoforge/build/libs/jukeboxmuse-neoforge-*.jar
-            fabric/build/libs/jukeboxmuse-fabric-*.jar
+          files: build/libs/*/jukeboxmuse-*.jar

@@ -10,7 +10,8 @@ mod.authors = "zifeng0109"
 
 # ./gradlew publishMods: project ids from the Modrinth / CurseForge project pages; empty skips that platform.
 # Tokens go in the MODRINTH_TOKEN / CURSEFORGE_TOKEN environment variables.
-publish.modrinth = "tWM4xkYP"
+# Modrinth is empty while the project (tWM4xkYP) is still under review there
+publish.modrinth = ""
 publish.curseforge = "1738426"
 
 # Bundled into the mod jar: QR codes (login, decoding QQ's PNG) and MP3 decoding
